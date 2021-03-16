@@ -1,0 +1,7 @@
+docker exec -i lab jupyter notebook password
+
+c.ServerApp.base_url = '/lab/'
+c.ServerApp.open_browser = False
+
+# nvtop
+docker exec -it lab /tmp/install_nvtop.sh
