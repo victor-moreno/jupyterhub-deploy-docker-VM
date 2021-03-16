@@ -8,17 +8,17 @@
     mount jupyterhub_config.py as volume
 
 #### Dockerfile
-install: 
-    dockerspawner 
-    oauthenticator
-    nativeauthenticator
-    jupyterhub-idle-culler 
-    PyJWT 
+    install: 
+        dockerspawner 
+        oauthenticator
+        nativeauthenticator
+        jupyterhub-idle-culler 
+        PyJWT 
 
 #### jupyterhub_config.py
 
-MyDockerSpawner: mounts volumes according to user
-MultiOAuthenticator: native, github, google
+    MyDockerSpawner: mounts volumes according to user
+    MultiOAuthenticator: native, github, google
 
 ### client image 
 
@@ -27,19 +27,19 @@ MultiOAuthenticator: native, github, google
     c.ServerProxy.servers
 
 #### Dockerfile
-from:
-    gpu-jupyter  cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
-install: 
-    code server
-    rstudio
+    from:
+        gpu-jupyter  cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
+    install: 
+        code server
+        rstudio
 
 
 ### build jupyterhub server:
-make build
+    make build
 
 ### build jupyterlab client:
-make image
+    make image
 
 ### start
-docker-compose up -d
+    docker-compose up -d
 
