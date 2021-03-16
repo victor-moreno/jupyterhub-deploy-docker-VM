@@ -14,8 +14,6 @@ NB_GID = 100
 c.Authenticator.allowed_users = {
 'victor-moreno',
 'h501uvma',
-'victor.r.moreno@gmail.com',
-'projecte-uic'
 }
 c.Authenticator.admin_users = {'victor-moreno','h501uvma'}
 
@@ -127,18 +125,6 @@ c.DockerSpawner.notebook_dir = notebook_dir
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
 #c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
-
-'''
-home_dir = str(os.environ.get('HOME_DIR'))
-data_dir = str(os.environ.get('DATA_DIR'))
-img_dir = str(os.environ.get('IMAGES_DIR'))
-
-c.DockerSpawner.volumes = { 
-  home_dir+'/{username}': notebook_dir ,
-  data_dir: notebook_dir+'/projects' ,
-  img_dir: notebook_dir+'/images' ,
-}
-'''
 
 # volume_driver is no longer a keyword argument to create_container()
 # c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
@@ -265,7 +251,7 @@ c.MultiOAuthenticator.authenticators = [
 ]
 
 # google
-c.GoogleOAuthenticator.hosted_domain = ['iconcologia.net', 'gmail.com', 'morenoaguado.net', 'asbarcelona.com']
+c.GoogleOAuthenticator.hosted_domain = ['gmail.com']
 c.GoogleOAuthenticator.login_service = 'Google'
 
 c.NativeAuthenticator.check_common_password = True

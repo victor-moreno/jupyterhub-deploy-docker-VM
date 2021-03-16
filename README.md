@@ -1,21 +1,37 @@
-# adapted from jupyterhub-deploy-docker 
+## adapted from: jupyterhub-deploy-docker 
 [https://github.com/jupyterhub/jupyterhub-deploy-docker](https://github.com/jupyterhub/jupyterhub-deploy-docker) 
 
 ### changes to server
 
-jupyterhub_config.py:
+#### docker-compose.yaml
+    -p 12000:443
+    mount jupyterhub_config.py as volume
 
-docker-compose.yaml:
--p 12000:443
+#### Dockerfile
+install: 
+    dockerspawner 
+    oauthenticator
+    nativeauthenticator
+    jupyterhub-idle-culler 
+    PyJWT 
 
-### .env
+#### jupyterhub_config.py
 
+MyDockerSpawner: mounts volumes according to user
+MultiOAuthenticator: native, github, google
 
 ### client image 
-jupyterhub_config.py:
 
-c.JupyterHub.base_url = '/jhub/'
+#### jupyterhub_config.py:
+    c.JupyterHub.base_url = '/jhub/'
+    c.ServerProxy.servers
 
+#### Dockerfile
+from:
+    gpu-jupyter  cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
+install: 
+    code server
+    rstudio
 
 
 ### build jupyterhub server:
@@ -24,6 +40,6 @@ make build
 ### build jupyterlab client:
 make image
 
-# start
+### start
 docker-compose up -d
 

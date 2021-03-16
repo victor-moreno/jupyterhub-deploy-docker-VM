@@ -15,7 +15,6 @@ services:
     env_file:
       - secrets/postgres.env
     volumes:
-#      - "${DB_VOLUME_HOST}:${DB_VOLUME_CONTAINER}"
       - "db:${DB_VOLUME_CONTAINER}"
 
   hub:
@@ -35,8 +34,6 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
-      # user-spcific data
-      - /tmp/cuda/jhub/data:/srv/data
       # config
       - ${JUPYTERHUB_CONFIG}:/srv/jupyterhub/jupyterhub_config.py
     ports:
