@@ -36,6 +36,8 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
       # config
       - ${JUPYTERHUB_CONFIG}:/srv/jupyterhub/jupyterhub_config.py
+      # user list
+      - ${USER_LIST}:/srv/jupyterhub/user_list.txt
     ports:
       - "12000:443"
     links:
@@ -56,6 +58,7 @@ services:
       HOME_DIR: ${HOME_DIR}
       DATA_DIR: ${DATA_DIR}
       IMAGES_DIR: ${IMAGES_DIR}
+      IMAGES_WORK_DIR: ${IMAGES_WORK_DIR}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env

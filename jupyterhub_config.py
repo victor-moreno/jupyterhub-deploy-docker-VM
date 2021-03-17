@@ -11,32 +11,37 @@ NB_UID = 1001
 NB_GID = 100
 
 # Whitlelist users and admins
-c.Authenticator.allowed_users = {
-'victor-moreno',
-'h501uvma',
-}
-c.Authenticator.admin_users = {'victor-moreno','h501uvma'}
+# google: remove @gmail.com
+#
+# remove to avoid conflicts creating new users
+#
+import ast
+with open('/srv/jupyterhub/user_list.txt') as f: 
+    team_map = ast.literal_eval(f.read())
 
+c.Authenticator.allowed_users = list(team_map.keys())
+
+c.Authenticator.admin_users = admin = set()
+for u, team in team_map.items():
+    if 'admin' in team:
+        admin.add(u)
+
+#c.Authenticator.username_map = {'victor.r.moreno@gmail.com': 'victor.r.moreno'}
+# c.JupyterHub.redirect_to_server = False
 
 # Spawn single-user servers as Docker containers
 
 from dockerspawner import DockerSpawner
 class MyDockerSpawner(DockerSpawner):
-    team_map = {
-        'h501uvma': ['images','projects'],
-        'victor-moreno': 'projects',
-        'projecte-uic': 'images',
-        'victor.r.moreno': ['images','projects'],
-    }
-
     def start(self):
+        self.team_map = team_map
         home_dir = os.environ.get('HOME_DIR')
         data_dir = os.environ.get('DATA_DIR')
+        work_dir = os.environ.get('IMAGES_WORK_DIR')
         img_dir = os.environ.get('IMAGES_DIR')
         notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR')
 
         username = self.user.name.split('@')[0]
-        self.user.name = username
 
         if username in self.team_map:
             teams = self.team_map[username]
@@ -56,6 +61,10 @@ class MyDockerSpawner(DockerSpawner):
             self.volumes[img_dir] = {
                 'bind': notebook_dir+'/images',
                 'mode': 'ro',
+            }
+            self.volumes[work_dir] = {
+                'bind': notebook_dir+'/work',
+                'mode': 'rw',
             }
         return super().start()
 
@@ -96,6 +105,10 @@ c.DockerSpawner.extra_host_config = {
 
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+
+## c.DockerSpawner.allowed_images = Union({}) form to select image to run
+
+c.DockerSpawner.default_url = '/lab'
 
 # JupyterHub requires a single-user instance of the Notebook server, so we
 # default to using the `start-singleuser.sh` script included in the
@@ -197,15 +210,15 @@ class MultiOAuthenticator(Authenticator):
             else:
                 url = url_path_join(authenticator["url_scope"], "oauth_login")
 
-            html.append(
-                f"""
-                <div class="service-login">
-                  <a role="button" class='btn btn-jupyter btn-lg' href='{url}'>
-                    Sign in with {login_service}
-                  </a>
-                </div>
-                """
-            )
+            # html.append(
+            #     f"""
+            #     <div class="service-login">
+            #       <a role="button" class='btn btn-jupyter btn-lg' href='{url}'>
+            #         Sign in with {login_service}
+            #       </a>
+            #     </div>
+            #     """
+            # )
         return "\n".join(html)
 
     def get_handlers(self, app):
@@ -249,10 +262,17 @@ c.MultiOAuthenticator.authenticators = [
 #        'login_service': 'Microsoft'
 #    })
 ]
+import nativeauthenticator
+c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}/templates/"]
+#  ["/usr/local/lib/python3.8/dist-packages/nativeauthenticator/templates/"]
 
 # google
-c.GoogleOAuthenticator.hosted_domain = ['gmail.com']
+# https://oauthenticator.readthedocs.io/en/latest/api/gen/oauthenticator.google.html
+c.GoogleOAuthenticator.hosted_domain = ['gmail.com','morenoaguado.net']
 c.GoogleOAuthenticator.login_service = 'Google'
+c.GoogleOAuthenticator.delete_invalid_users = True
+# c.GoogleOAuthenticator.allowed_users = {'victor.r.moreno@gmail.com'}
+# c.GoogleOAuthenticator.allowed_google_groups = {'uic'}
 
 c.NativeAuthenticator.check_common_password = True
 c.NativeAuthenticator.minimum_password_length = 8
@@ -282,6 +302,9 @@ c.JupyterHub.services = [
         'command': [sys.executable, '-m', 'jupyterhub_idle_culler', '--timeout=3600'],
     }
 ]
+
+# max simultaneous users
+c.JupyterHub.concurrent_spawn_limit = 10
 
 # user limits
 # c.Spawner.cpu_limit = 2 # cores

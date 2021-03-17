@@ -25,5 +25,5 @@ RUN pip3 install --no-cache-dir dockerspawner oauthenticator \
 
 # RUN cd /tmp && git clone https://github.com/jupyterhub/nativeauthenticator.git && pip3 install /tmp/nativeauthenticator && rm -rf /tmp/nativeauthenticator
 COPY native /tmp/native
-RUN cd /tmp/native && ls -la && pip3 install . && cd / && rm -rf /tmp/native
+RUN cd /tmp/native && pip3 install . && cd / && rm -rf /tmp/native
 
