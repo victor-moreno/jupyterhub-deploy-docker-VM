@@ -45,10 +45,11 @@ else
 	cert_files=
 endif
 
-check-files: $(cert_files) secrets/oauth.env secrets/postgres.env # userlist
+check-files: $(cert_files) secrets/oauth.env secrets/postgres.env secrets/user_list.txt
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
+
 
 image:  pull singleuser/Dockerfile
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
@@ -56,7 +57,17 @@ image:  pull singleuser/Dockerfile
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
 
+pull2:
+	docker pull $(DOCKER_NOTEBOOK_IMAGE2)
+
+image2:  pull2 singleuser/Dockerfile2
+	docker build -t $(LOCAL_NOTEBOOK_IMAGE2) \
+	    --file singleuser/Dockerfile2 \
+		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
+		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE2) \
+		singleuser
+
 build: check-files network volumes
 	docker-compose build
 
-.PHONY: network volumes check-files pull notebook_image build
+.PHONY: network volumes check-files pull image image2 build

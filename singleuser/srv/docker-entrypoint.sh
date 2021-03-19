@@ -16,6 +16,9 @@ if [ "$(which "$1")" = "/usr/local/bin/start-singleuser.sh" ]; then
        ln -s /home/jovyan/.bashrc /home/jovyan/.profile
        chown -R 1001:100 /home/jovyan/.bashrc /home/jovyan/.profile
     fi
+    if [ ! -f /home/jovyan/.Rprofile ]; then
+       echo ".libPaths(paste0(R.home(), "/library"))" >> /home/jovyan/.Rprofile
+    fi
 fi
 
 # Run the command provided

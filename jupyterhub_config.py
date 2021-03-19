@@ -19,6 +19,8 @@ import ast
 with open('/srv/jupyterhub/user_list.txt') as f: 
     team_map = ast.literal_eval(f.read())
 
+c = get_config()  
+
 c.Authenticator.allowed_users = list(team_map.keys())
 
 c.Authenticator.admin_users = admin = set()
@@ -31,8 +33,37 @@ for u, team in team_map.items():
 
 # Spawn single-user servers as Docker containers
 
+# c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+
 from dockerspawner import DockerSpawner
-class MyDockerSpawner(DockerSpawner):
+
+# form to select image
+
+allowed_images = { 
+    'GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
+    'Python & R': 'jupyter-r',
+}
+def get_options_form(spawner):
+    option_t = '<option value="{image}" {selected}>{label}</option>'
+    options = [
+        option_t.format(
+            image=image, label=label, selected='selected' if image == spawner.image else ''
+        )
+        for label, image in allowed_images.items()
+    ]
+    return """
+    <label for="image">Select an image:</label>
+    <select class="form-control" name="image" required autofocus>
+    {options}
+    </select>
+    """.format(
+        options=options
+    )
+c.DockerSpawner.options_form = get_options_form
+
+class CustomDockerSpawner(DockerSpawner):
+    
+    # mount volumes by team
     def start(self):
         self.team_map = team_map
         home_dir = os.environ.get('HOME_DIR')
@@ -41,12 +72,14 @@ class MyDockerSpawner(DockerSpawner):
         img_dir = os.environ.get('IMAGES_DIR')
         notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR')
 
-        username = self.user.name.split('@')[0]
+        username = self.user.name
 
         if username in self.team_map:
             teams = self.team_map[username]
         else:
             teams = ''
+
+        username = username.split('@')[0]
 
         self.volumes[f"{home_dir}/{username}"] = {
             'bind': notebook_dir,
@@ -66,11 +99,12 @@ class MyDockerSpawner(DockerSpawner):
                 'bind': notebook_dir+'/work',
                 'mode': 'rw',
             }
+
         return super().start()
+    
 
 
-c.JupyterHub.spawner_class = MyDockerSpawner
-# c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+c.JupyterHub.spawner_class = CustomDockerSpawner
 
 c.DockerSpawner.environment = {
 'NB_USER':'jovyan',
@@ -104,11 +138,13 @@ c.DockerSpawner.extra_host_config = {
 # 'device_requests': [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]], ), ], }
 
 # Spawn containers from this image
-c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+# c.DockerSpawner.allowed_images = { 
+#     'python-R-julia': 'jupyterhub-user:latest',
+#     'python-R': 'jupyterhub-user2:latest',
+# }
 
-## c.DockerSpawner.allowed_images = Union({}) form to select image to run
+# c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 
-c.DockerSpawner.default_url = '/lab'
 
 # JupyterHub requires a single-user instance of the Notebook server, so we
 # default to using the `start-singleuser.sh` script included in the
@@ -139,13 +175,8 @@ c.DockerSpawner.notebook_dir = notebook_dir
 # notebook directory in the container
 #c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 
-# volume_driver is no longer a keyword argument to create_container()
-# c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
-
-# For debugging arguments passed to spawned containers
-#c.DockerSpawner.debug = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.base_url = '/jhub/'
@@ -168,6 +199,9 @@ c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
     password=os.environ['POSTGRES_PASSWORD'],
     db=os.environ['POSTGRES_DB'],
 )
+
+# reset database
+# c.JupyterHub.reset_db = False
 
 # Authenticate users
 
@@ -280,7 +314,7 @@ c.NativeAuthenticator.allowed_failed_logins = 3
 
 # end OAuth
 
-## enable authentication state
+## enable authentication state0
 c.MultiOAuthenticator.enable_auth_state = True
 import warnings
 if 'JUPYTERHUB_CRYPT_KEY' not in os.environ:
@@ -306,7 +340,9 @@ c.JupyterHub.services = [
 # max simultaneous users
 c.JupyterHub.concurrent_spawn_limit = 10
 
+
 # user limits
 # c.Spawner.cpu_limit = 2 # cores
 # c.Spawner.mem_limit = 8G 
 
+# c.JupyterHub.load_groups = Dict()
