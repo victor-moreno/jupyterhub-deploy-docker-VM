@@ -49,25 +49,29 @@ check-files: $(cert_files) secrets/oauth.env secrets/postgres.env secrets/user_l
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
+pull2:
+	docker pull $(DOCKER_NOTEBOOK_IMAGE2)
 
-
-image:  pull singleuser/Dockerfile
+image:
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
 		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
 
-pull2:
-	docker pull $(DOCKER_NOTEBOOK_IMAGE2)
-
-image2:  pull2 singleuser/Dockerfile2
+image2:
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE2) \
 	    --file singleuser/Dockerfile2 \
 		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE2) \
 		singleuser
+image3:
+	docker build -t $(LOCAL_NOTEBOOK_IMAGE3) \
+	    --file singleuser/Dockerfile3 \
+		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
+		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+		singleuser
 
 build: check-files network volumes
 	docker-compose build
 
-.PHONY: network volumes check-files pull image image2 build
+.PHONY: network volumes check-files pull image image2 image3 build

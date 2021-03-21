@@ -59,6 +59,7 @@ services:
       DATA_DIR: ${DATA_DIR}
       IMAGES_DIR: ${IMAGES_DIR}
       IMAGES_WORK_DIR: ${IMAGES_WORK_DIR}
+      IMAGE_FOLDER: ${IMAGE_FOLDER}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env

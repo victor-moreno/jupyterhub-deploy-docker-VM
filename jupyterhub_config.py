@@ -42,6 +42,7 @@ from dockerspawner import DockerSpawner
 allowed_images = { 
     'GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
     'Python & R': 'jupyter-r',
+    'devel': 'jupyter-gpu3',
 }
 def get_options_form(spawner):
     option_t = '<option value="{image}" {selected}>{label}</option>'
@@ -113,7 +114,8 @@ c.DockerSpawner.environment = {
 'NB_UMASK':'002',
 'GRANT_SUDO':'yes',
 'CHOWN_HOME':'yes',
-'JUPYTER_ENABLE_LAB':'yes'
+'JUPYTER_ENABLE_LAB':'yes',
+'IMAGE_FOLDER': os.environ['IMAGE_FOLDER'],
 }
 
 '''
