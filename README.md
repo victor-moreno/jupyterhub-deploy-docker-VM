@@ -43,3 +43,8 @@
 ### start
     docker-compose up -d
 
+### services for jupyter_proxy
+
+    - jupyter-rserver_proxy (RStudio)
+    - jupyter_codeserver_proxy (Code Server)
+    - jupyter_deepzoom_proxy (openslide python)
