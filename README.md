@@ -44,7 +44,7 @@
     docker-compose up -d
 
 ### services for jupyter_proxy
-
+    in singleuser/srv:
     - jupyter-rserver_proxy (RStudio)
     - jupyter_codeserver_proxy (Code Server)
     - jupyter_deepzoom_proxy (openslide python)
