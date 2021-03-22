@@ -15,6 +15,7 @@ RUN conda install -c conda-forge \
     code-server \
     imagemagick \
     openslide flask \
+    "nbconvert<6" \
  && jupyter labextension install @jupyterlab/server-proxy
 
 RUN pip3 install --no-cache-dir openslide-python
@@ -51,6 +52,8 @@ RUN cd /tmp \
     && echo "USER=jovyan" >> /etc/environment \
     && echo -e "rsession-which-r=/opt/conda/lib/R\nrsession-ld-library-path=/opt/conda/lib:/opt/conda/x86_64-conda-linux-gnu/lib/" >> /etc/rstudio/rserver.conf \
     && cd $cwd
+
+RUN rm /usr/lib/x86_64-linux-gnu/lib*.so.450.*
 
 COPY srv /srv
 

@@ -1,0 +1,12 @@
+- deepzoom:
+    images_dir: /home/jovyan/images/T
+    new_browser: True
+
+- tensorboard:
+    logdir: /home/jovyan/board
+    new_browser: False
+
+- codeserver:
+    new_browser: False
+
+

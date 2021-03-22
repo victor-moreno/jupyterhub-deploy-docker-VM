@@ -11,6 +11,11 @@ if [ "$(which "$1")" = "/usr/local/bin/start-singleuser.sh" ]; then
        cp /srv/jupyter_notebook_config.py /home/jovyan/.jupyter/
        chown -R 1001:100 /home/jovyan/.jupyter
     fi 
+    if [ ! -f /home/jovyan/.jupyter/services.yaml ]; then
+       mkdir -p /home/jovyan/.jupyter
+          cp /srv/services.yaml /home/jovyan/.jupyter/
+       chown -R 1001:100 /home/jovyan/.jupyter
+    fi 
     if [ ! -f /home/jovyan/.bashrc ]; then
        cp /srv/.bashrc /home/jovyan/.bashrc
        ln -s /home/jovyan/.bashrc /home/jovyan/.profile

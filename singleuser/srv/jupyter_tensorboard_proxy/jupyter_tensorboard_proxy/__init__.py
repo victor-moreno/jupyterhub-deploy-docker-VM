@@ -1,19 +1,26 @@
 import os
 import shutil
+import yaml
+
+# load config
+with open(os.path.expanduser('~/.jupyter/services.yaml'), 'r') as cfgfile:
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
+
+def get_key(key, app='tensorboard', cfg=cfg):
+    for a in cfg:
+        for k, v in a.items():
+            if k == app:
+                return v.get(key)
 
 def get_logdir():
-    board_folder = ''
-    filename = os.path.expanduser('~/.board')
-    if os.path.isfile(filename):
-        with open(filename) as f:
-            board_folder = f.readline().rstrip()
-
-    if board_folder == '' or not os.path.isdir(board_folder):
-        board_folder = '/home/jovyan/board'
-        if not os.path.isdir(board_folder):
-            os.mkdir(board_folder)
-            
-    return board_folder
+    logdir = get_key('logdir')
+    if logdir == None:
+        logdir =  os.path.expanduser('~/board')
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
+        if not os.path.isdir(logdir):
+            raise Exception(f'Could not create {logdir}')
+    return logdir            
 
 def get_tensorboard(prog):
     if shutil.which(prog):
@@ -43,7 +50,7 @@ def setup_tensorboard():
   return {
     'command': _get_cmd,
     'timeout': 20,
-    'new_browser_tab': get_new_browser(),
+    'new_browser_tab': get_key('new_browser'),
     'launcher_entry': {
       'title': 'Tensorboard',
       'icon_path': get_icon_path(),

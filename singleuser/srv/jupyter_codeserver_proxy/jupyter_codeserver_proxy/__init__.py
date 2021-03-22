@@ -1,6 +1,16 @@
 import os
 import shutil
-import pathlib
+import yaml
+
+# load config
+with open(os.path.expanduser('~/.jupyter/services.yaml'), 'r') as cfgfile:
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
+
+def get_key(key, app='codeserver', cfg=cfg):
+    for a in cfg:
+        for k, v in a.items():
+            if k == app:
+                return v.get(key)
 
 def get_codeserver(prog):
     if shutil.which(prog):
@@ -30,7 +40,7 @@ def setup_codeserver():
   return {
     'command': _get_cmd,
     'timeout': 20,
-    'new_browser_tab': get_new_browser(),
+    'new_browser_tab': get_key('new_browser'),
     'launcher_entry': {
       'title': 'Code Server',
       'icon_path': get_icon_path()

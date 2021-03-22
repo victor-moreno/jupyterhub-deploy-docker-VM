@@ -1,4 +1,25 @@
 import os
+import yaml
+
+# load config
+with open(os.path.expanduser('~/.jupyter/services.yaml'), 'r') as cfgfile:
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
+
+def get_key(key, app='deepzoom', cfg=cfg):
+    for a in cfg:
+        for k, v in a.items():
+            if k == app:
+                return v.get(key)
+
+def get_images_dir():
+    images_dir = get_key('images_dir')
+    if images_dir == None:
+        images_dir =  os.path.expanduser('~/images')
+    if not os.path.isdir(images_dir):
+        os.mkdir(images_dir)
+        if not os.path.isdir(images_dir):
+            raise Exception(f'Could not create {images_dir}')
+    return images_dir            
 
 def get_image_folder():
     filename = os.path.expanduser('~/.images')
@@ -42,7 +63,7 @@ def setup_deepzoom():
     return {
           'command': _get_cmd,
           'timeout': 120,
-          'new_browser_tab': get_new_browser(),
+          'new_browser_tab': get_key('new_browser'),
           'launcher_entry': {
               'title': 'Deepzoom openslide',
               'icon_path': get_icon_path()
