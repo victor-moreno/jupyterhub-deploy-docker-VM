@@ -2,8 +2,9 @@ jupyter deepzoom proxy
 
 Adds a proxy service to jupyter to view openslide images
 
-images should be in $IMAGE_FOLDER or /home/jovyan/images or /home/jovyan
-
+config:
+- a new browser tab is opened if exists file ~/.jupyter/.new_browser 
+- if file ~/.images exists and has a valid folder, it is used to load images. Otherwise, ~/images or ~/ is used
 
 This package uses code from OpenSlide Python
 

@@ -56,7 +56,9 @@ COPY srv /srv
 
 RUN pip3 install /srv/jupyter_codeserver_proxy \
  && pip3 install /srv/jupyter_deepzoom_proxy \
- && rm -rf /srv/jupyter*_proxy
+ && pip3 install /srv/jupyter_tensorboard_proxy \
+ && rm -rf /srv/jupyter*_proxy \
+ && chmod g+w /opt/conda/share/jupyter/lab/extensions
 
 USER jovyan
 

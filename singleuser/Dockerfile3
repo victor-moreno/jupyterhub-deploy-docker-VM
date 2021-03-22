@@ -15,6 +15,7 @@ RUN conda install -c conda-forge \
     code-server \
     imagemagick \
     openslide flask \
+    "nbconvert=5.6.1" \
  && jupyter labextension install @jupyterlab/server-proxy
 
 RUN pip3 install --no-cache-dir openslide-python
@@ -52,12 +53,17 @@ RUN cd /tmp \
     && echo -e "rsession-which-r=/opt/conda/lib/R\nrsession-ld-library-path=/opt/conda/lib:/opt/conda/x86_64-conda-linux-gnu/lib/" >> /etc/rstudio/rserver.conf \
     && cd $cwd
 
-USER jovyan
+RUN rm /usr/lib/x86_64-linux-gnu/lib*.so.450.*
 
 COPY srv /srv
 
 RUN pip3 install /srv/jupyter_codeserver_proxy \
- && pip3 install /srv/jupyter_deepzoom_proxy
+ && pip3 install /srv/jupyter_deepzoom_proxy \
+ && pip3 install /srv/jupyter_tensorboard_proxy \
+ && rm -rf /srv/jupyter*_proxy \
+ && chmod g+w /opt/conda/share/jupyter/lab/extensions
+
+USER jovyan
 
 ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
 CMD ["start-singleuser.sh"]

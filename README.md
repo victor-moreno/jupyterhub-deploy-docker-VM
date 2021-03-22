@@ -48,3 +48,4 @@
     - jupyter-rserver_proxy (RStudio)
     - jupyter_codeserver_proxy (Code Server)
     - jupyter_deepzoom_proxy (openslide python)
+    - jupyter_tensorboard_proxy (tensorboard)
