@@ -62,7 +62,7 @@ def setup_deepzoom():
         return cmd
     return {
           'command': _get_cmd,
-          'timeout': 120,
+          'timeout': 240,
           'new_browser_tab': get_key('new_browser'),
           'launcher_entry': {
               'title': 'Deepzoom openslide',

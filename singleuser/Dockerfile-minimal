@@ -1,0 +1,13 @@
+FROM jupyter/minimal-notebook
+
+ARG JUPYTERIMG_VERSION
+
+# jupyterhub: last version from github
+# RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
+
+USER $NB_USER
+
+ENV START=/lab
+
+# ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+# CMD ["start-singleuser.sh"]

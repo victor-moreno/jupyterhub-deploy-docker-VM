@@ -5,5 +5,5 @@ secrets
 singleuser/gpu-jupyter
 singleuser/lab
 singleuser/nvtop
-singleuser/rstudio-server-1.3.959-amd64.deb
+singleuser/rstudio
 .vscode

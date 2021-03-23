@@ -71,7 +71,21 @@ image3:
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
 
+imageR:
+	docker build -t jupyter-rstudio \
+	    --file singleuser/Dockerfile-rstudio \
+		singleuser
+
+imageS:
+	docker build -t jupyter-snpimpute \
+	    --file singleuser/Dockerfile-snpimpute \
+		singleuser
+
+imageM:
+	docker build -t jupyter-minimal \
+	    --file singleuser/Dockerfile-minimal \
+		singleuser
 build: check-files network volumes
 	docker-compose build
 
-.PHONY: network volumes check-files pull image image2 image3 build
+.PHONY: network volumes check-files pull image image2 image3 imageR build

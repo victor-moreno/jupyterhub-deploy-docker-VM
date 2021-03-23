@@ -41,7 +41,10 @@ from dockerspawner import DockerSpawner
 
 allowed_images = { 
     'GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
+    'RStudio': 'jupyter-rstudio',
+    'SNP imputation': 'jupyter-snpimpute',
     'Python & R': 'jupyter-r',
+    'Minimal': 'jupyter-minimal',
     'devel': 'jupyter-gpu3',
 }
 def get_options_form(spawner):
@@ -86,11 +89,6 @@ class CustomDockerSpawner(DockerSpawner):
             'bind': notebook_dir,
             'mode': 'rw',
         }
-        if 'projects' in teams:
-            self.volumes[data_dir] = {
-                'bind': notebook_dir+'/projects',
-                'mode': 'rw',
-            }
         if 'images' in teams:
             self.volumes[img_dir] = {
                 'bind': notebook_dir+'/images',
@@ -98,6 +96,16 @@ class CustomDockerSpawner(DockerSpawner):
             }
             self.volumes[work_dir] = {
                 'bind': notebook_dir+'/work',
+                'mode': 'rw',
+            }
+        if 'projects' in teams:
+            self.volumes['/tmp/cuda/tf/projects/'] = {
+                'bind': notebook_dir+'/projects',
+                'mode': 'rw',
+            }
+        if 'vm' in teams:
+            self.volumes['/tmp/cuda/tf/vm/'] = {
+                'bind': notebook_dir+'/vm',
                 'mode': 'rw',
             }
 
@@ -342,9 +350,11 @@ c.JupyterHub.services = [
 # max simultaneous users
 c.JupyterHub.concurrent_spawn_limit = 10
 
-
 # user limits
 # c.Spawner.cpu_limit = 2 # cores
 # c.Spawner.mem_limit = 8G 
 
 # c.JupyterHub.load_groups = Dict()
+
+# c.Spawner.args = ['--NotebookApp.default_url=/rstudio']
+

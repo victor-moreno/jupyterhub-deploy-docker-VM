@@ -1,0 +1,10 @@
+FROM jupyter-rstudio
+
+RUN conda install -c bioconda plink vcftools bcftools
+
+USER $NB_USER
+
+ENV START=/rstudio
+
+# ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+# CMD ["start-singleuser.sh"]
