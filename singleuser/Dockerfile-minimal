@@ -9,5 +9,6 @@ USER $NB_USER
 
 ENV START=/lab
 
-# ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
-# CMD ["start-singleuser.sh"]
+COPY srv /srv
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

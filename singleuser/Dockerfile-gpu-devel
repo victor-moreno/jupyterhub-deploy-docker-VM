@@ -1,7 +1,7 @@
-ARG DOCKER_NOTEBOOK_IMAGE
-FROM $DOCKER_NOTEBOOK_IMAGE
-ARG JUPYTERIMG_VERSION
-#RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERIMG_VERSION
+FROM cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
+
+#ARG JUPYTERHUB_VERSION
+#RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
 
 # jupyterhub: last version from github
 RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub

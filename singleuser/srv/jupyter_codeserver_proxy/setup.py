@@ -20,7 +20,7 @@ setuptools.setup(
       'jupyter_codeserver_proxy': ['icons/codeserver.svg'],
   },
 
-  install_requires=['jupyter-server-proxy'],
+  install_requires=['jupyter-server-proxy','pyyaml'],
 )
 
 # requires: conda install -c conda-forge code-server

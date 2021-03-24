@@ -1,0 +1,14 @@
+FROM jupyter-minimal
+
+RUN conda install -c conda-forge openslide flask Pillow pyyaml \
+    jupyter-server-proxy \
+# && jupyter labextension install @jupyterlab/server-proxy
+  && echo
+
+COPY srv /srv
+
+RUN pip3 install --no-cache-dir openslide-python \
+ && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy
+
+ENV START=/deepzoom
+

@@ -18,7 +18,7 @@ setuptools.setup(
   package_data={
       'jupyter_tensorboard_proxy': ['icons/tensorboard.svg'],
   },
-  install_requires=['jupyter-server-proxy','tensorboard'],
+  install_requires=['jupyter-server-proxy','tensorboard','pyyaml'],
 )
 
 # requires: conda install -c conda-forge code-server

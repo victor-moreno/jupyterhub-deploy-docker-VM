@@ -1,5 +1,7 @@
-FROM jupyter/r-notebook
-ARG JUPYTERIMG_VERSION
+FROM jupyter/r-notebook:latest
+
+# ARG JUPYTERHUB_VERSION
+# RUN   python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
 
 # jupyterhub: last version from github
 RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
@@ -7,7 +9,6 @@ RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
     jupyter-rsession-proxy \
-    "nbconvert<6" \
  && jupyter labextension install @jupyterlab/server-proxy
 
 USER root
@@ -49,5 +50,10 @@ USER $NB_USER
 
 ENV START=/rstudio
 
-# ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
-# CMD ["start-singleuser.sh"]
+COPY srv /srv
+
+USER root
+
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]
+

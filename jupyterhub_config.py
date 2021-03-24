@@ -45,7 +45,8 @@ allowed_images = {
     'SNP imputation': 'jupyter-snpimpute',
     'Python & R': 'jupyter-r',
     'Minimal': 'jupyter-minimal',
-    'devel': 'jupyter-gpu3',
+    'Visualizar imágenes': 'jupyter-deepzoom',
+    'devel': 'jupyter-gpu-devel',
 }
 def get_options_form(spawner):
     option_t = '<option value="{image}" {selected}>{label}</option>'

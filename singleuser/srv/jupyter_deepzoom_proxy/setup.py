@@ -16,7 +16,7 @@ setuptools.setup(
       'jupyter_deepzoom_proxy': [ 'deepzoom_multiserver', 'icons/deepzoom.svg', 'templates/*.html', 'static/*.js', 'static/images/*.png' ]
   }, 
   include_package_data=True,
-  install_requires=['jupyter-server-proxy', 'flask','openslide-python'],
+  install_requires=['jupyter-server-proxy', 'flask','openslide-python','pyyaml'],
 )
 
 # requires: conda install -c conda-forge openslide flask

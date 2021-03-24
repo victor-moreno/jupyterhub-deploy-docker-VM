@@ -47,31 +47,23 @@ endif
 
 check-files: $(cert_files) secrets/oauth.env secrets/postgres.env secrets/user_list.txt
 
-pull:
-	docker pull $(DOCKER_NOTEBOOK_IMAGE)
-pull2:
-	docker pull $(DOCKER_NOTEBOOK_IMAGE2)
-
 image:
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
-		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
-		singleuser
-
-image2:
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE2) \
-	    --file singleuser/Dockerfile2 \
-		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE2) \
-		singleuser
-image3:
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE3) \
-	    --file singleuser/Dockerfile3 \
-		--build-arg JUPYTERIMG_VERSION=$(JUPYTERIMG_VERSION) \
+	docker build -t jupyter-gpu \
+	    --file singleuser/Dockerfile-gpu \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
 
 imageR:
+	docker build -t jupyter-r \
+	    --file singleuser/Dockerfile-r \
+		singleuser
+imageD:
+	docker build -t jupyter-gpu-devel \
+	    --file singleuser/Dockerfile-gpu-devel \
+		singleuser
+
+imageRS:
 	docker build -t jupyter-rstudio \
 	    --file singleuser/Dockerfile-rstudio \
 		singleuser
@@ -85,7 +77,13 @@ imageM:
 	docker build -t jupyter-minimal \
 	    --file singleuser/Dockerfile-minimal \
 		singleuser
+
+imageZ:
+	docker build -t jupyter-deepzoom \
+	    --file singleuser/Dockerfile-deepzoom \
+		singleuser
+
 build: check-files network volumes
 	docker-compose build
 
-.PHONY: network volumes check-files pull image image2 image3 imageR build
+.PHONY: network volumes check-files image build
