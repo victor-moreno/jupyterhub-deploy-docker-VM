@@ -64,6 +64,21 @@ def get_options_form(spawner):
     """.format(
         options=options
     )
+'''
+# allow different images by team
+    username = self.user.name
+
+    if username in self.team_map:
+        teams = self.team_map[username]
+    else:
+        teams = ''
+
+    username = username.split('@')[0]
+    if 'images' in teams:
+        show_images = {k:v for k,v in allowed_images.items() if 'minimal' in v or v == 'jupyter-gpu'}
+
+
+'''    
 c.DockerSpawner.options_form = get_options_form
 
 class CustomDockerSpawner(DockerSpawner):
@@ -100,12 +115,25 @@ class CustomDockerSpawner(DockerSpawner):
                 'mode': 'rw',
             }
         if 'projects' in teams:
-            self.volumes['/tmp/cuda/tf/projects/'] = {
+            self.volumes['/mnt/mimas/remote/tf/projects/'] = {
                 'bind': notebook_dir+'/projects',
                 'mode': 'rw',
             }
+            self.volumes['/mnt/typhon/data/outcomes/inSCAN/data'] = {
+                'bind': notebook_dir+'/projects/inscan/data',
+                'mode': 'ro',
+            }
+            self.volumes['/mnt/typhon/data/outcomes/melanoma/png'] = {
+                'bind': notebook_dir+'/projects/melanoma/data',
+                'mode': 'ro',
+            }
+            self.volumes['/mnt/hydra/ubs/shared/projects/COLONOMICS/TILs/clones'] = {
+                'bind': notebook_dir+'/projects/clones',
+                'mode': 'rw',
+            }
+
         if 'vm' in teams:
-            self.volumes['/tmp/cuda/tf/vm/'] = {
+            self.volumes['/mnt/mimas/remote/tf/vm/'] = {
                 'bind': notebook_dir+'/vm',
                 'mode': 'rw',
             }
@@ -143,9 +171,10 @@ c.DockerSpawner.extra_create_kwargs = {
 }
 
 # nvidia
-c.DockerSpawner.extra_host_config = {
-'runtime': 'nvidia',
-}
+if os.environ['CUDA'] == 'cuda':
+    c.DockerSpawner.extra_host_config = {
+    'runtime': 'nvidia',
+    }
 # 'device_requests': [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]], ), ], }
 
 # Spawn containers from this image
@@ -186,6 +215,17 @@ c.DockerSpawner.notebook_dir = notebook_dir
 # notebook directory in the container
 #c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 
+# external proxy
+c.JupyterHub.cleanup_servers = False
+# tells the hub to not stop servers when the hub restarts (this is useful even if you don’t run the proxy separately).
+
+c.ConfigurableHTTPProxy.should_start = False
+# tells the hub that the proxy should not be started (because you start it yourself).
+c.ConfigurableHTTPProxy.auth_token = os.environ.get('CONFIGPROXY_AUTH_TOKEN')
+# token for authenticating communication with the proxy.
+c.ConfigurableHTTPProxy.api_url = 'http://jupyterproxy:8001' #'http://192.168.1.254:8001'
+# the URL which the hub uses to connect to the proxy’s API.
+
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
 
@@ -194,10 +234,10 @@ c.JupyterHub.base_url = '/jhub/'
 c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8080
 
-# TLS config: requires generating certificates
-c.JupyterHub.port = 443
-c.JupyterHub.ssl_key = os.environ['SSL_KEY']
-c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+# # TLS config: requires generating certificates
+# c.JupyterHub.port = 443
+# c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+# c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')

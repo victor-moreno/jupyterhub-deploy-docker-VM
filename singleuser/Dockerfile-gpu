@@ -17,7 +17,8 @@ RUN conda install -c conda-forge \
     jupyter-rsession-proxy \
     code-server \
     imagemagick \
-    openslide flask
+    openslide flask \
+    visdom
 
 RUN pip3 install --no-cache-dir openslide-python
 
@@ -63,8 +64,8 @@ COPY srv /srv
 RUN pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
  && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
  && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \
- && rm -rf /srv/jupyter*_proxy \
- && chmod g+w /opt/conda/share/jupyter/lab/extensions
+ && chmod g+w /opt/conda/share/jupyter/lab/extensions \
+ && rm -rf /srv/jupyter*_proxy
 
 USER jovyan
 

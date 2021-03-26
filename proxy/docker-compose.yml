@@ -1,0 +1,30 @@
+version: "2"
+
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
+
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    image: jupyterproxy
+    container_name: jupyterproxy
+    ports:
+      - "12000:12000"
+    environment:
+      CONFIGPROXY_AUTH_TOKEN: ${CONFIGPROXY_AUTH_TOKEN}
+    command: >
+      configurable-http-proxy --ip=0.0.0.0 --port=12000 --api-ip=0.0.0.0 --api-port=8001 --default-target=http://jupyterhub:8080/ --error-target=http://jupyterhub:8080/jhub/hub/error 
+
+# https://github.com/jupyterhub/configurable-http-proxy
+# https://hub.docker.com/r/jupyterhub/configurable-http-proxy/      
+
+# c.JupyterHub.cleanup_servers = False          | should be set, which tells the hub to not stop servers when the hub restarts (this is useful even if you don’t run the proxy separately).
+# c.ConfigurableHTTPProxy.should_start = False  | should be set, which tells the hub that the proxy should not be started (because you start it yourself).
+# c.ConfigurableHTTPProxy.auth_token = CONFIGPROXY_AUTH_TOKEN    | should be set to a token for authenticating communication with the proxy.
+# c.ConfigurableHTTPProxy.api_url = 'http://jupyterproxy:8001'  | should be set to the URL which the hub uses to connect to the proxy’s API.
+

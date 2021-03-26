@@ -32,10 +32,6 @@ def get_icon_path():
         os.path.dirname(os.path.abspath(__file__)), 'icons', 'tensorboard.svg'
     )
 
-def get_new_browser():
-    # if file ~/.jupyter/.new_browser exists, open in new browser
-    return os.path.isfile(os.path.expanduser('~/.jupyter/.new_browser'))
-
 def setup_tensorboard():
   def _get_cmd(port):
     cmd = [

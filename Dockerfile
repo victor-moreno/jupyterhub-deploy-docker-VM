@@ -11,13 +11,13 @@ RUN apt-get update && apt-get install -y libpq-dev git \
     && /usr/bin/python3 -m pip install --upgrade pip \
     && pip3 install --no-cache-dir psycopg2-binary
 
-# Copy TLS certificate and key
-ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
-ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
-COPY ./secrets/*.crt $SSL_CERT
-COPY ./secrets/*.key $SSL_KEY
-RUN chmod 700 /srv/jupyterhub/secrets && \
-    chmod 600 /srv/jupyterhub/secrets/*
+# # Copy TLS certificate and key
+# ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
+# ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
+# COPY ./secrets/*.crt $SSL_CERT
+# COPY ./secrets/*.key $SSL_KEY
+# RUN chmod 700 /srv/jupyterhub/secrets && \
+#     chmod 600 /srv/jupyterhub/secrets/*
 
 # Install dockerspawner, oauth
 RUN pip3 install --no-cache-dir dockerspawner oauthenticator \

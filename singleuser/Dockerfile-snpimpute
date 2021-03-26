@@ -1,6 +1,6 @@
 FROM jupyter-rstudio
 
-RUN conda install -c bioconda plink vcftools bcftools
+RUN conda install -c bioconda plink vcftools perl-vcftools-vcf bcftools p7zip
 
 USER $NB_USER
 

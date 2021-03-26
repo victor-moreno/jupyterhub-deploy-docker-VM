@@ -4,7 +4,6 @@
 ### changes to server
 
 #### docker-compose.yaml
-    -p 12000:443
     mount jupyterhub_config.py as volume
 
 #### Dockerfile
@@ -33,6 +32,9 @@
         code server
         rstudio
 
+#### configurable proxy
+    runs as a separated docker sharing the network. This way shutting down the hub doesn't close clients
+    see ./proxy
 
 ### build jupyterhub server:
     make build

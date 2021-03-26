@@ -6,29 +6,24 @@ import yaml
 with open(os.path.expanduser('~/.jupyter/services.yaml'), 'r') as cfgfile:
     cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
 
-def get_key(key, app='codeserver', cfg=cfg):
+def get_key(key, app='visdom', cfg=cfg):
     for a in cfg:
         for k, v in a.items():
             if k == app:
                 return v.get(key)
 
-def get_codeserver(prog):
+def get_visdom(prog):
     if shutil.which(prog):
         return prog
     raise FileNotFoundError(f'Could not find {prog} in PATH')
 
-def get_icon_path():
-    return os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), 'icons', 'codeserver.svg'
-    )
-
-def setup_codeserver():
+def setup_visdom():
   def _get_cmd(port):
     cmd = [
-            get_codeserver('code-server'), 
-            '--auth=none', 
-            '--disable-telemetry', 
-            '--bind-addr=127.0.0.1:{port}'
+            get_visdom('visdom'),
+            '--hostname=0.0.0.0',
+            '-port={port}',
+            '-proxy_url={base_url}visdom',
     ]
     return cmd
   
@@ -37,7 +32,6 @@ def setup_codeserver():
     'timeout': 20,
     'new_browser_tab': get_key('new_browser'),
     'launcher_entry': {
-      'title': 'Code Server',
-      'icon_path': get_icon_path()
+      'title': 'Visdom',
     }
   }
