@@ -47,7 +47,7 @@ endif
 
 check-files: $(cert_files) secrets/oauth.env secrets/postgres.env secrets/user_list.txt
 
-image:
+imageG:
 	docker build -t jupyter-gpu \
 	    --file singleuser/Dockerfile-gpu \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
@@ -81,6 +81,11 @@ imageM:
 imageZ:
 	docker build -t jupyter-deepzoom \
 	    --file singleuser/Dockerfile-deepzoom \
+		singleuser
+
+imageF:
+	docker build -t jupyter-full \
+	    --file singleuser/Dockerfile-full \
 		singleuser
 
 build: check-files network volumes

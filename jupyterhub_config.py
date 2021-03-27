@@ -5,6 +5,9 @@
 import os
 
 
+# pending:  - deepzoom check images can be shown or exit
+#           - if only one image start directly
+
 # pre-spawn settings
 
 NB_UID = 1001
@@ -18,6 +21,8 @@ NB_GID = 100
 import ast
 with open('/srv/jupyterhub/user_list.txt') as f: 
     team_map = ast.literal_eval(f.read())
+
+CUDA = 'cuda' in os.environ['HOSTNODE']  
 
 c = get_config()  
 
@@ -39,16 +44,34 @@ from dockerspawner import DockerSpawner
 
 # form to select image
 
-allowed_images = { 
-    'GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
-    'RStudio': 'jupyter-rstudio',
-    'SNP imputation': 'jupyter-snpimpute',
-    'Python & R': 'jupyter-r',
-    'Minimal': 'jupyter-minimal',
-    'Visualizar imágenes': 'jupyter-deepzoom',
-    'devel': 'jupyter-gpu-devel',
+available_images = { 
+    'G-  GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
+    'F-  Python, R, Rstudio, Julia, code': 'jupyter-full',
+    'RS- RStudio': 'jupyter-rstudio',
+    'S   SNP imputation': 'jupyter-snpimpute',
+    'R-  Python & R': 'jupyter-r',
+    'M-  Minimal': 'jupyter-minimal',
+    'I-  Visualizar imágenes': 'jupyter-deepzoom',
+    'D-  devel': 'jupyter-gpu-devel',
 }
 def get_options_form(spawner):
+    username = spawner.user.name.split('@')[0]
+    if username in team_map:
+        teams = team_map[username]
+    else:
+        teams = ''
+
+    allowed_images = available_images
+
+    if not CUDA:
+        allowed_images = {k:v for k,v in allowed_images.items() if not 'G-' in k }
+    if 'devel' not in teams:
+        allowed_images = {k:v for k,v in allowed_images.items() if not 'D-' in k }
+    if 'snps' not in teams:
+        allowed_images = {k:v for k,v in allowed_images.items() if not 'S-' in k }
+    if 'crcpath' in teams:
+        allowed_images = {k:v for k,v in allowed_images.items() if 'I-' in k }
+
     option_t = '<option value="{image}" {selected}>{label}</option>'
     options = [
         option_t.format(
@@ -57,12 +80,12 @@ def get_options_form(spawner):
         for label, image in allowed_images.items()
     ]
     return """
-    <label for="image">Select an image:</label>
+    <label for="image">Select an image for {username}:</label>
     <select class="form-control" name="image" required autofocus>
     {options}
     </select>
     """.format(
-        options=options
+        options=options, username=username
     )
 '''
 # allow different images by team
@@ -171,10 +194,11 @@ c.DockerSpawner.extra_create_kwargs = {
 }
 
 # nvidia
-if os.environ['CUDA'] == 'cuda':
+if CUDA:
     c.DockerSpawner.extra_host_config = {
     'runtime': 'nvidia',
     }
+
 # 'device_requests': [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]], ), ], }
 
 # Spawn containers from this image
@@ -324,29 +348,48 @@ from oauthenticator.google import GoogleOAuthenticator
 from nativeauthenticator import NativeAuthenticator
 #from oauthenticator.azuread  import AzureAdOAuthenticator
 
-c.MultiOAuthenticator.authenticators = [
-    (GitHubOAuthenticator, '/github', {
-        'client_id': os.environ['GITHUB_CLIENT_ID'],
-        'client_secret': os.environ['GITHUB_CLIENT_SECRET'],
-        'oauth_callback_url': os.environ['GITHUB_CALLBACK_URL']
-    }),
-    (GoogleOAuthenticator, '/google', {
-        'client_id': os.environ['GOOGLE_CLIENT_ID'],
-        'client_secret': os.environ['GOOGLE_CLIENT_SECRET'],
-        'oauth_callback_url': os.environ['GOOGLE_CALLBACK_URL'],
-        'login_service': 'Google'
-    }),
-    (NativeAuthenticator, '/', {
-        'login_service': 'User/Pass'
-    }),
-#    (AzureAdOAuthenticator, '/microsoft', {
-#        'client_id': os.environ['AZURE_CLIENT_ID'],
-#        'client_secret': os.environ['AZURE_CLIENT_SECRET'],
-#        'oauth_callback_url': os.environ['AZURE_CALLBACK_URL'],
-#        'tenant_id': os.environ['AZURE_TENANT_ID'],
-#        'login_service': 'Microsoft'
-#    })
-]
+if CUDA:
+    c.MultiOAuthenticator.authenticators = [
+        (GitHubOAuthenticator, '/github', {
+            'client_id': os.environ['GITHUB_CLIENT_ID'],
+            'client_secret': os.environ['GITHUB_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['GITHUB_CALLBACK_URL']
+        }),
+        (GoogleOAuthenticator, '/google', {
+            'client_id': os.environ['GOOGLE_CLIENT_ID'],
+            'client_secret': os.environ['GOOGLE_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['GOOGLE_CALLBACK_URL'],
+            'login_service': 'Google'
+        }),
+        (NativeAuthenticator, '/', {
+            'login_service': 'User/Pass'
+        }),
+    #    (AzureAdOAuthenticator, '/microsoft', {
+    #        'client_id': os.environ['AZURE_CLIENT_ID'],
+    #        'client_secret': os.environ['AZURE_CLIENT_SECRET'],
+    #        'oauth_callback_url': os.environ['AZURE_CALLBACK_URL'],
+    #        'tenant_id': os.environ['AZURE_TENANT_ID'],
+    #        'login_service': 'Microsoft'
+    #    })
+    ]
+else:
+    c.MultiOAuthenticator.authenticators = [
+        (GitHubOAuthenticator, '/github', {
+            'client_id': os.environ['DGITHUB_CLIENT_ID'],
+            'client_secret': os.environ['DGITHUB_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['DGITHUB_CALLBACK_URL']
+        }),
+        (GoogleOAuthenticator, '/google', {
+            'client_id': os.environ['DGOOGLE_CLIENT_ID'],
+            'client_secret': os.environ['DGOOGLE_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['DGOOGLE_CALLBACK_URL'],
+            'login_service': 'Google'
+        }),
+        (NativeAuthenticator, '/', {
+            'login_service': 'User/Pass'
+        }),
+    ]
+        
 import nativeauthenticator
 c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}/templates/"]
 #  ["/usr/local/lib/python3.8/dist-packages/nativeauthenticator/templates/"]
@@ -394,8 +437,3 @@ c.JupyterHub.concurrent_spawn_limit = 10
 # user limits
 # c.Spawner.cpu_limit = 2 # cores
 # c.Spawner.mem_limit = 8G 
-
-# c.JupyterHub.load_groups = Dict()
-
-# c.Spawner.args = ['--NotebookApp.default_url=/rstudio']
-

@@ -62,7 +62,8 @@ services:
       IMAGES_DIR: ${IMAGES_DIR}
       IMAGES_WORK_DIR: ${IMAGES_WORK_DIR}
       IMAGE_FOLDER: ${IMAGE_FOLDER}
-      CUDA: ${CUDA}
+      #
+      HOSTNODE: ${HOSTNAME}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env
