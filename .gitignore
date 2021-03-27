@@ -6,4 +6,5 @@ singleuser/gpu-jupyter
 singleuser/lab
 singleuser/nvtop
 singleuser/rstudio
+singleuser/srv/visdom
 .vscode

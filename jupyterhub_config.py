@@ -4,7 +4,6 @@
 # Configuration file for JupyterHub
 import os
 
-
 # pending:  - deepzoom check images can be shown or exit
 #           - if only one image start directly
 
@@ -13,37 +12,26 @@ import os
 NB_UID = 1001
 NB_GID = 100
 
-# Whitlelist users and admins
-# google: remove @gmail.com
-#
-# remove to avoid conflicts creating new users
-#
-import ast
-with open('/srv/jupyterhub/user_list.txt') as f: 
-    team_map = ast.literal_eval(f.read())
-
 CUDA = 'cuda' in os.environ['HOSTNODE']  
 
 c = get_config()  
 
-c.Authenticator.allowed_users = list(team_map.keys())
+# read users & teams 
+import ast
+with open('/srv/jupyterhub/user_list.txt') as f: 
+    team_map = ast.literal_eval(f.read())
 
+# Whitlelist users and admins       # google: remove @gmail.com
+c.Authenticator.allowed_users = list(team_map.keys())
 c.Authenticator.admin_users = admin = set()
 for u, team in team_map.items():
     if 'admin' in team:
         admin.add(u)
 
-#c.Authenticator.username_map = {'victor.r.moreno@gmail.com': 'victor.r.moreno'}
-# c.JupyterHub.redirect_to_server = False
-
-# Spawn single-user servers as Docker containers
-
-# c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
-
-from dockerspawner import DockerSpawner
+# Spawn single-user servers as Docker containers    
+# CustomDockerSpawner
 
 # form to select image
-
 available_images = { 
     'G-  GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
     'F-  Python, R, Rstudio, Julia, code': 'jupyter-full',
@@ -54,6 +42,7 @@ available_images = {
     'I-  Visualizar imágenes': 'jupyter-deepzoom',
     'D-  devel': 'jupyter-gpu-devel',
 }
+
 def get_options_form(spawner):
     username = spawner.user.name.split('@')[0]
     if username in team_map:
@@ -63,6 +52,7 @@ def get_options_form(spawner):
 
     allowed_images = available_images
 
+    # remove images if not in team
     if not CUDA:
         allowed_images = {k:v for k,v in allowed_images.items() if not 'G-' in k }
     if 'devel' not in teams:
@@ -71,39 +61,34 @@ def get_options_form(spawner):
         allowed_images = {k:v for k,v in allowed_images.items() if not 'S-' in k }
     if 'crcpath' in teams:
         allowed_images = {k:v for k,v in allowed_images.items() if 'I-' in k }
-
-    option_t = '<option value="{image}" {selected}>{label}</option>'
-    options = [
-        option_t.format(
-            image=image, label=label, selected='selected' if image == spawner.image else ''
-        )
-        for label, image in allowed_images.items()
-    ]
-    return """
-    <label for="image">Select an image for {username}:</label>
-    <select class="form-control" name="image" required autofocus>
-    {options}
-    </select>
-    """.format(
-        options=options, username=username
-    )
-'''
-# allow different images by team
-    username = self.user.name
-
-    if username in self.team_map:
-        teams = self.team_map[username]
+    
+    # prepare form
+    if len(allowed_images) > 1:
+        option_t = '<option value="{image}" {selected}>{label}</option>'
+        options = [
+            option_t.format(
+                image=image, label=label, selected='selected' if image == spawner.image else ''
+            )
+            for label, image in allowed_images.items()
+        ]
+        return """
+        <br><br>
+        <label for="image">Select an image for {username}:</label>
+        <select class="form-control" name="image" required autofocus>
+        {options}
+        </select>
+        """.format(options=options, username=username)
     else:
-        teams = ''
-
-    username = username.split('@')[0]
-    if 'images' in teams:
-        show_images = {k:v for k,v in allowed_images.items() if 'minimal' in v or v == 'jupyter-gpu'}
-
-
-'''    
+        spawner.image = [v for k,v in allowed_images.items()][0]
+'''
+options form: dictionary of lists of strings
+additional options form
+- select lab / tree
+- define image folder
+'''
 c.DockerSpawner.options_form = get_options_form
 
+from dockerspawner import DockerSpawner
 class CustomDockerSpawner(DockerSpawner):
     
     # mount volumes by team
@@ -160,11 +145,11 @@ class CustomDockerSpawner(DockerSpawner):
                 'bind': notebook_dir+'/vm',
                 'mode': 'rw',
             }
-
+        # user_options = self.user_options
         return super().start()
     
 
-
+# c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 c.JupyterHub.spawner_class = CustomDockerSpawner
 
 c.DockerSpawner.environment = {
@@ -200,14 +185,6 @@ if CUDA:
     }
 
 # 'device_requests': [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]], ), ], }
-
-# Spawn containers from this image
-# c.DockerSpawner.allowed_images = { 
-#     'python-R-julia': 'jupyterhub-user:latest',
-#     'python-R': 'jupyterhub-user2:latest',
-# }
-
-# c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 
 
 # JupyterHub requires a single-user instance of the Notebook server, so we
