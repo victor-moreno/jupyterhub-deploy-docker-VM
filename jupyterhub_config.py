@@ -16,10 +16,12 @@ CUDA = 'cuda' in os.environ['HOSTNODE']
 
 c = get_config()  
 
-# read users & teams 
-import ast
-with open('/srv/jupyterhub/user_list.txt') as f: 
-    team_map = ast.literal_eval(f.read())
+# read users/teams & images
+import os, yaml
+with open('/srv/jupyterhub/config.yaml', 'r') as cfgfile:
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
+
+team_map = cfg['users']
 
 # Whitlelist users and admins       # google: remove @gmail.com
 c.Authenticator.allowed_users = list(team_map.keys())
@@ -32,36 +34,30 @@ for u, team in team_map.items():
 # CustomDockerSpawner
 
 # form to select image
-available_images = { 
-    'G-  GPU:  Python, R, Rstudio, Julia, code': 'jupyter-gpu',
-    'F-  Python, R, Rstudio, Julia, code': 'jupyter-full',
-    'RS- RStudio': 'jupyter-rstudio',
-    'S   SNP imputation': 'jupyter-snpimpute',
-    'R-  Python & R': 'jupyter-r',
-    'M-  Minimal': 'jupyter-minimal',
-    'I-  Visualizar imágenes': 'jupyter-deepzoom',
-    'D-  devel': 'jupyter-gpu-devel',
-}
-
 def get_options_form(spawner):
-    username = spawner.user.name.split('@')[0]
-    if username in team_map:
-        teams = team_map[username]
-    else:
-        teams = ''
+    username = spawner.user.name  #  .split('@')[0]
+    teams = cfg['users'][username]
+    images = cfg['images']
 
-    allowed_images = available_images
-
-    # remove images if not in team
+    # list of image letters for user
+    img = {k:v for k,v in images.items() if k in teams }
+    images = [] # unique list
+    for t,i in img.items():
+        for k in i:
+            if k not in images:
+                images.append(k)
     if not CUDA:
-        allowed_images = {k:v for k,v in allowed_images.items() if not 'G-' in k }
-    if 'devel' not in teams:
-        allowed_images = {k:v for k,v in allowed_images.items() if not 'D-' in k }
-    if 'snps' not in teams:
-        allowed_images = {k:v for k,v in allowed_images.items() if not 'S-' in k }
-    if 'crcpath' in teams:
-        allowed_images = {k:v for k,v in allowed_images.items() if 'I-' in k }
+        images = [i for i in images if i  != 'G']
+
+    # dict of image label:build
+    available_images = cfg['available_images']
+    allowed_images = [v for k,v in available_images.items() if k in images]
+    images=[]
+    for i in allowed_images:
+        images = images | i.items()
     
+    allowed_images = dict(images)
+
     # prepare form
     if len(allowed_images) > 1:
         option_t = '<option value="{image}" {selected}>{label}</option>'
@@ -80,12 +76,7 @@ def get_options_form(spawner):
         """.format(options=options, username=username)
     else:
         spawner.image = [v for k,v in allowed_images.items()][0]
-'''
-options form: dictionary of lists of strings
-additional options form
-- select lab / tree
-- define image folder
-'''
+
 c.DockerSpawner.options_form = get_options_form
 
 from dockerspawner import DockerSpawner
@@ -93,59 +84,26 @@ class CustomDockerSpawner(DockerSpawner):
     
     # mount volumes by team
     def start(self):
-        self.team_map = team_map
         home_dir = os.environ.get('HOME_DIR')
-        data_dir = os.environ.get('DATA_DIR')
-        work_dir = os.environ.get('IMAGES_WORK_DIR')
-        img_dir = os.environ.get('IMAGES_DIR')
         notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR')
 
         username = self.user.name
 
-        if username in self.team_map:
-            teams = self.team_map[username]
-        else:
-            teams = ''
-
-        username = username.split('@')[0]
-
-        self.volumes[f"{home_dir}/{username}"] = {
+        self.volumes[f"{home_dir}/{username.split('@')[0]}"] = {
             'bind': notebook_dir,
             'mode': 'rw',
         }
-        if 'images' in teams:
-            self.volumes[img_dir] = {
-                'bind': notebook_dir+'/images',
-                'mode': 'ro',
-            }
-            self.volumes[work_dir] = {
-                'bind': notebook_dir+'/work',
-                'mode': 'rw',
-            }
-        if 'projects' in teams:
-            self.volumes['/mnt/mimas/remote/tf/projects/'] = {
-                'bind': notebook_dir+'/projects',
-                'mode': 'rw',
-            }
-            self.volumes['/mnt/typhon/data/outcomes/inSCAN/data'] = {
-                'bind': notebook_dir+'/projects/inscan/data',
-                'mode': 'ro',
-            }
-            self.volumes['/mnt/typhon/data/outcomes/melanoma/png'] = {
-                'bind': notebook_dir+'/projects/melanoma/data',
-                'mode': 'ro',
-            }
-            self.volumes['/mnt/hydra/ubs/shared/projects/COLONOMICS/TILs/clones'] = {
-                'bind': notebook_dir+'/projects/clones',
-                'mode': 'rw',
-            }
 
-        if 'vm' in teams:
-            self.volumes['/mnt/mimas/remote/tf/vm/'] = {
-                'bind': notebook_dir+'/vm',
-                'mode': 'rw',
-            }
-        # user_options = self.user_options
+        teams = cfg['users'][username]
+        mounts = cfg['mounts']
+
+        mounts = {k:v for k,v in mounts.items() if k in teams }
+
+        for k,v in mounts.items():
+            for h,d in v.items():
+                self.volumes[h] = { 'bind': d[0], 'mode': d[1] }
+           
+
         return super().start()
     
 
@@ -159,8 +117,6 @@ c.DockerSpawner.environment = {
 'NB_UMASK':'002',
 'GRANT_SUDO':'yes',
 'CHOWN_HOME':'yes',
-'JUPYTER_ENABLE_LAB':'yes',
-'IMAGE_FOLDER': os.environ['IMAGE_FOLDER'],
 }
 
 '''
@@ -414,3 +370,4 @@ c.JupyterHub.concurrent_spawn_limit = 10
 # user limits
 # c.Spawner.cpu_limit = 2 # cores
 # c.Spawner.mem_limit = 8G 
+

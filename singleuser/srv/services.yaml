@@ -1,5 +1,5 @@
 - deepzoom:
-    images_dir: /home/jovyan/images/T
+    images_dir: /home/jovyan/images/U
     new_browser: True
 
 - tensorboard:
@@ -9,4 +9,6 @@
 - codeserver:
     new_browser: False
 
+- visdom:
+    new_browser: True
 

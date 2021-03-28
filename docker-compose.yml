@@ -36,8 +36,8 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
       # config
       - ${JUPYTERHUB_CONFIG}:/srv/jupyterhub/jupyterhub_config.py
-      # user list
-      - ${USER_LIST}:/srv/jupyterhub/user_list.txt
+      # user & image list
+      - ${USER_LIST}:/srv/jupyterhub/config.yaml
     # ports:
     #   - "12000:443"
     links:
@@ -58,10 +58,6 @@ services:
       CONFIGPROXY_AUTH_TOKEN: ${CONFIGPROXY_AUTH_TOKEN}
       # user volumes
       HOME_DIR: ${HOME_DIR}
-      DATA_DIR: ${DATA_DIR}
-      IMAGES_DIR: ${IMAGES_DIR}
-      IMAGES_WORK_DIR: ${IMAGES_WORK_DIR}
-      IMAGE_FOLDER: ${IMAGE_FOLDER}
       #
       HOSTNODE: ${HOSTNAME}
     env_file:

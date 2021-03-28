@@ -1,0 +1,16 @@
+FROM jupyter-minimal:latest
+
+USER root
+
+RUN curl -s https://api.github.com/repos/sosedoff/pgweb/releases/latest \
+  | grep linux_amd64.zip \
+  | grep download \
+  | cut -d '"' -f 4 \
+  | wget -qi - \
+  && unzip pgweb_linux_amd64.zip \
+  && rm pgweb_linux_amd64.zip \
+  && mv pgweb_linux_amd64 /usr/local/bin/pgweb
+  
+RUN pip3 install git+https://github.com/illumidesk/jupyter-pgweb-proxy.git
+
+USER jovyan

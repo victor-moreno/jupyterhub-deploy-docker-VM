@@ -59,8 +59,8 @@ imageR:
 	    --file singleuser/Dockerfile-r \
 		singleuser
 imageD:
-	docker build -t jupyter-gpu-devel \
-	    --file singleuser/Dockerfile-gpu-devel \
+	docker build -t jupyter-devel \
+	    --file singleuser/Dockerfile-devel \
 		singleuser
 
 imageRS:
@@ -86,6 +86,11 @@ imageZ:
 imageF:
 	docker build -t jupyter-full \
 	    --file singleuser/Dockerfile-full \
+		singleuser
+
+imageP:
+	docker build -t jupyter-pgweb \
+	    --file singleuser/Dockerfile-pgweb \
 		singleuser
 
 build: check-files network volumes

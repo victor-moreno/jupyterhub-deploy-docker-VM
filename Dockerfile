@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y libpq-dev git \
 
 # Install dockerspawner, oauth
 RUN pip3 install --no-cache-dir dockerspawner oauthenticator \
-    jupyterhub-idle-culler PyJWT 
+    jupyterhub-idle-culler PyJWT pyyaml
 
 # RUN cd /tmp && git clone https://github.com/jupyterhub/nativeauthenticator.git && pip3 install /tmp/nativeauthenticator && rm -rf /tmp/nativeauthenticator
 COPY native /tmp/native
