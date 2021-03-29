@@ -16,7 +16,7 @@ def get_images_dir():
     if images_dir == None:
         images_dir =  os.path.expanduser('~/images')
     if not os.path.isdir(images_dir):
-        os.mkdir(images_dir)
+        os.makedirs(images_dir, exist_ok=True)
         if not os.path.isdir(images_dir):
             raise Exception(f'Could not create {images_dir}')
     return images_dir            

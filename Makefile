@@ -93,7 +93,14 @@ imageP:
 	    --file singleuser/Dockerfile-pgweb \
 		singleuser
 
+proxy:
+	docker build -t jupyterproxy \
+	    --file proxy/Dockerfile \
+		proxy
+
 build: check-files network volumes
 	docker-compose build
+
+
 
 .PHONY: network volumes check-files image build
