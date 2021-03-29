@@ -4,9 +4,6 @@
 # Configuration file for JupyterHub
 import os
 
-# pending:  - deepzoom check images can be shown or exit
-#           - if only one image start directly
-
 # pre-spawn settings
 
 NB_UID = 1001
@@ -191,6 +188,7 @@ c.JupyterHub.base_url = '/jhub/'
 c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8080
 
+# don't need because we are behind an https reverse proxy
 # # TLS config: requires generating certificates
 # c.JupyterHub.port = 443
 # c.JupyterHub.ssl_key = os.environ['SSL_KEY']
