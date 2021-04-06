@@ -12,7 +12,12 @@ li.none {
 </style>
 
 <h1>Available Slides</h1>
-<h5>close tab to exit</h5>
+
+<div style="text-align:right; width:90%; padding:0;">
+    <a href = "{{logout}}">
+        <button>logout</button>
+    </a>
+</div>
 
 <ul>
     {% for entry in root_dir.children recursive %}

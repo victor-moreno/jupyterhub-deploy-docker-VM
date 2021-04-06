@@ -128,7 +128,11 @@ def _get_slide(path):
 
 @app.route('/')
 def index():
-    return render_template('files.html', root_dir=_Directory(app.basedir), base_url=app.config['BASE_URL'])
+    return render_template('files.html', 
+        root_dir=_Directory(app.basedir), 
+        base_url=app.config['BASE_URL'], 
+        logout= app.config['BASE_URL'].replace('deepzoom','logout')
+        )
 
 @app.route('/<path:path>')
 def slide(path):

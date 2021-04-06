@@ -16,14 +16,18 @@ RUN conda install -c conda-forge \
     code-server \
     imagemagick \
     openslide flask \
-    visdom
+    visdom \
+    nano \
+    git \
+    wget
+
+# RUN conda install -c hcc midnight-commander
 
 RUN pip3 install --no-cache-dir openslide-python
 
 # rstudio
 RUN apt-get update && apt-get -y --no-install-recommends install \
     file \
-    git \
     libapparmor1 \
     libgc1c2 \
     libclang-dev \
@@ -37,9 +41,11 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     procps \
     python-setuptools \
     sudo \
-    wget \
     mc\
     && apt-get clean && rm -rf /var/lib/apt/lists
+
+#    git \
+#    wget \
 
 #ENV RSTUDIO_VERSION=1.4.1106 not working
 ENV RSTUDIO_VERSION=1.3.959

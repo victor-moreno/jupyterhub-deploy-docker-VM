@@ -1,0 +1,18 @@
+FROM jamovi/jamovi:latest
+
+# RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists
+# RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip3 install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
+
+RUN pip3 install -U jupyterlab jupyterhub pyyaml \
+    jupyter-server-proxy \
+ && jupyter labextension install @jupyterlab/server-proxy \
+ && echo
+
+# COPY srv /srv
+
+# RUN pip3 install --no-cache-dir openslide-python \
+# && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy
+#
+# ENV START=/jamovi
+
+CMD ["/usr/bin/python3 -m jamovi.server 41337 --if=*"]

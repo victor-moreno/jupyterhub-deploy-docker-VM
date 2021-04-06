@@ -46,5 +46,4 @@ imageP:
 	docker build -t jupyter-pgweb \
 	    --file Dockerfile-pgweb \
 		.
-all:
-	imageD imageF imageG imageM imageP imageR imageRS imageS imageZ
+all:	imageD imageF imageG imageM imageP imageR imageRS imageS imageZ
