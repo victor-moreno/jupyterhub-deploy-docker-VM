@@ -76,6 +76,25 @@ def get_options_form(spawner):
 
 c.DockerSpawner.options_form = get_options_form
 
+def set_sudo(spawner):
+    username = spawner.user.name
+    teams = cfg['users'][username]
+    if 'sudo' in teams:
+        return 'yes'
+    else:
+        return 'no'
+
+c.DockerSpawner.environment = {
+'NB_USER':'jovyan',
+'NB_UID': NB_UID,
+'NB_GID': NB_GID,
+'NB_UMASK':'002',
+'CHOWN_HOME':'yes',
+'GRANT_SUDO': set_sudo, 
+}
+
+    
+
 from dockerspawner import DockerSpawner
 class CustomDockerSpawner(DockerSpawner):
     
@@ -107,6 +126,9 @@ class CustomDockerSpawner(DockerSpawner):
 # c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 c.JupyterHub.spawner_class = CustomDockerSpawner
 
+
+'''
+
 c.DockerSpawner.environment = {
 'NB_USER':'jovyan',
 'NB_UID': NB_UID,
@@ -116,7 +138,6 @@ c.DockerSpawner.environment = {
 'CHOWN_HOME':'yes',
 }
 
-'''
 # hook to run before spawning user image
 def pre_spawn_hook(spawner):
     username = spawner.user.name

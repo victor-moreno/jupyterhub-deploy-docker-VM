@@ -9,7 +9,12 @@ RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
     jupyter-rsession-proxy \
- && jupyter labextension install @jupyterlab/server-proxy
+    bash \
+    nano \
+    git \
+    wget
+    
+# && jupyter labextension install @jupyterlab/server-proxy 
 
 USER root
 
