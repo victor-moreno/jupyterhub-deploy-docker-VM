@@ -126,26 +126,7 @@ class CustomDockerSpawner(DockerSpawner):
 # c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 c.JupyterHub.spawner_class = CustomDockerSpawner
 
-
-'''
-
-c.DockerSpawner.environment = {
-'NB_USER':'jovyan',
-'NB_UID': NB_UID,
-'NB_GID': NB_GID,
-'NB_UMASK':'002',
-'GRANT_SUDO':'yes',
-'CHOWN_HOME':'yes',
-}
-
-# hook to run before spawning user image
-def pre_spawn_hook(spawner):
-    username = spawner.user.name
-    # images
-
-c.Spawner.pre_spawn_hook = pre_spawn_hook
-'''
-
+# 'user': 'root',
 
 c.DockerSpawner.extra_create_kwargs = {
 'user': 'root',
