@@ -25,13 +25,12 @@ if [ "$(which "$1")" = "/usr/local/bin/start-singleuser.sh" ]; then
        echo ".libPaths(paste0(R.home(), '/library'))" >> /home/jovyan/.Rprofile
        chown -R 1001:100 /home/jovyan/.Rprofile
     fi
-    if [ "$JUPYTER_IMAGE_SPEC" == "jupyter-vnc" ]; then
+    if [ "$JUPYTER_IMAGE_SPEC" == "jupyter-vnc" ] && [ ! -f ${HOME}/Desktop/labelimg.desktop ]; then
       export RESOURCES_LOC=$(python -c "import jupyter_labelimg_proxy as pkg; print(pkg.__path__[0])")/resources
       mkdir -p ${HOME}/Desktop ${HOME}/.icons ${HOME}/.local/share/applications
       cp ${RESOURCES_LOC}/labelimg.desktop ${HOME}/Desktop/
       cp ${RESOURCES_LOC}/labelimg.desktop ${HOME}/.local/share/applications
       ln -s ${RESOURCES_LOC}/labelimg.png ${HOME}/.icons/labelimg.png
-      cp ${RESOURCES_LOC}/user-dirs.defaults /etc/xdg/user-dirs.defaults
       touch ${HOME}/.Xauthority
       chown 1001:100 -R ${HOME}/.local ${HOME}/.config ${HOME}/.icons ${HOME}/Desktop ${HOME}/.Xauthority
     fi

@@ -2,7 +2,12 @@
 #
 # The values are relative pathnames from the home directory and
 # will be translated on a per-path-element basis into the users locale
+# is in /etc/xdg/
+
 DESKTOP=Desktop
+
+# VM: don't want these folders
+
 #DOWNLOAD=Downloads
 #TEMPLATES=Templates
 #PUBLICSHARE=Public
