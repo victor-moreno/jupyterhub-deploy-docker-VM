@@ -1,0 +1,65 @@
+FROM jupyter/minimal-notebook
+
+ARG JUPYTERIMG_VERSION
+
+# jupyterhub: last version from github
+# RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
+
+USER root
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y update \
+    && apt-get install -y \
+    dbus-x11 \
+    firefox \
+    xfce4 \
+    xfce4-panel \
+    xfce4-session \
+    xfce4-settings \
+    xorg \
+    xubuntu-icon-theme \
+    curl \
+    pyqt5-dev-tools \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
+
+# https://github.com/mathworks-ref-arch/matlab-integration-for-jupyter/blob/main/matlab-vnc/Dockerfile
+# Install tigervnc to /usr/local
+RUN curl -sSfL 'https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-1.10.0.x86_64.tar.gz' \
+    | tar -zxf - -C /usr/local --strip=2
+
+# Get noVNC
+ENV NOVNC_PATH=/opt/noVNC
+RUN mkdir -p ${NOVNC_PATH} \
+     && curl -sSfL 'https://github.com/novnc/noVNC/archive/v1.2.0.tar.gz' \
+     | tar -zxf - -C ${NOVNC_PATH} --strip=1 \ 
+     && chown -R ${NB_USER}:users ${NOVNC_PATH} \
+     && chmod -R 775 ${NOVNC_PATH} 
+
+RUN conda install -c conda-forge websockify=0.9.0 \
+    jupyter-server-proxy pyyaml \
+    bash nano \
+    lxml pyqt \
+    openslide flask Pillow 
+
+# labelImg
+RUN cd /tmp \
+ && git clone https://github.com/tzutalin/labelImg \
+ && cd labelImg \
+ && make qt5py3 \
+ && pip3 install . \
+ && cd && rm -rf /tmp/labelImg
+
+COPY srv /srv
+
+RUN pip3 install --no-cache-dir /srv/jupyter_labelimg_proxy \
+ && cp /srv/jupyter_labelimg_proxy/jupyter_labelimg_proxy/resources/novnc_lite.html /opt/noVNC/index.html \
+ && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy 
+
+USER $NB_USER
+
+ENV START=/lab
+
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

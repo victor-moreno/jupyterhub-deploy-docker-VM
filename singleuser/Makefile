@@ -46,4 +46,11 @@ imageP:
 	docker build -t jupyter-pgweb \
 	    --file Dockerfile-pgweb \
 		.
-all:	imageD imageF imageG imageM imageP imageR imageRS imageS imageZ
+imageV:
+	docker build -t jupyter-vnc \
+	    --file Dockerfile-vnc \
+		.
+
+
+all14:	imageF imageM imageP imageR imageRS imageS imageZ imageV imageG imageD 
+all00:	imageF imageM imageP imageR imageRS imageS imageZ imageV

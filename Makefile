@@ -93,6 +93,11 @@ imageP:
 	    --file singleuser/Dockerfile-pgweb \
 		singleuser
 
+imageV:
+	docker build -t jupyter-vnc \
+	    --file singleuser/Dockerfile-vnc \
+		singleuser
+
 proxy:
 	docker build -t jupyterproxy \
 	    --file proxy/Dockerfile \
