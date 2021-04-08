@@ -1,4 +1,4 @@
-FROM jupyter/datascience-notebook:lab-3.0.11
+FROM jupyter/datascience-notebook:lab-3.0.12
 # https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#core-stacks
 # https://hub.docker.com/r/jupyter/datascience-notebook/tags/?page=1&ordering=last_updated
 
@@ -10,6 +10,7 @@ RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install
 
 USER root
 
+RUN conda update -n base conda
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
     jupyter-rsession-proxy \
@@ -17,11 +18,10 @@ RUN conda install -c conda-forge \
     imagemagick \
     openslide flask \
     visdom \
+    bash \
     nano \
     git \
     wget
-
-# RUN conda install -c hcc midnight-commander
 
 RUN pip3 install --no-cache-dir openslide-python
 

@@ -18,7 +18,8 @@ RUN conda install -c conda-forge \
     code-server \
     imagemagick \
     openslide flask \
-    visdom
+    visdom 
+    
 
 RUN pip3 install --no-cache-dir openslide-python
 

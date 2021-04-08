@@ -1,9 +1,7 @@
 FROM jupyter-minimal
 
 RUN conda install -c conda-forge openslide flask Pillow pyyaml \
-    jupyter-server-proxy \
-# && jupyter labextension install @jupyterlab/server-proxy
-  && echo
+    jupyter-server-proxy
 
 COPY srv /srv
 

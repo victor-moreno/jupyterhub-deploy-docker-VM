@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=labelImg
+Exec=labelImg
+Icon=labelimg.png
+Terminal=false
+StartupNotify=true
+Categories=Graphics;
