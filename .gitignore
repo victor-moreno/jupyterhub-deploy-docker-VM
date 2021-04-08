@@ -7,4 +7,6 @@ singleuser/lab
 singleuser/nvtop
 singleuser/rstudio
 singleuser/srv/visdom
+singleuser/srv/jamovi
+singleuser/srv/jupyter-rsession-proxy
 .vscode

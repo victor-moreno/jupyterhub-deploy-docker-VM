@@ -55,6 +55,7 @@ COPY srv /srv
 
 RUN pip3 install --no-cache-dir /srv/jupyter_labelimg_proxy \
  && cp /srv/jupyter_labelimg_proxy/jupyter_labelimg_proxy/resources/novnc_lite.html /opt/noVNC/index.html \
+ && chown -R ${NB_USER}:users /opt/noVNC/index.html && chmod 755 /opt/noVNC/index.html \
  && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy 
 
 USER $NB_USER
