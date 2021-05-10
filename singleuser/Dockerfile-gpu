@@ -1,25 +1,22 @@
 FROM cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
 
-#ARG JUPYTERHUB_VERSION
-#RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
-
 # jupyterhub: last version from github
-RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
+#RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
 
 USER root
-COPY nvtop /usr/local/bin/nvtop
 
-# remove cuda-450
-RUN rm /usr/lib/x86_64-linux-gnu/lib*.so.450.*
+RUN conda update -n base conda
+RUN conda update -c conda-forge -y notebook jupyterhub jupyterlab ipywidgets
+
+# COPY nvtop /usr/local/bin/nvtop
 
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
     jupyter-rsession-proxy \
-    code-server \
     imagemagick \
-    openslide flask \
-    visdom 
+    openslide flask
     
+RUN jupyter labextension install jupyterlab-plotly @jupyter-widgets/jupyterlab-manager plotlywidget @ijmbarr/jupyterlab_spellchecker
 
 RUN pip3 install --no-cache-dir openslide-python
 
@@ -41,7 +38,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     python-setuptools \
     sudo \
     wget \
-    mc\
+    mc \
     && apt-get clean && rm -rf /var/lib/apt/lists
 
 #ENV RSTUDIO_VERSION=1.4.1106 not working
@@ -59,13 +56,32 @@ RUN cd /tmp \
     && echo -e "rsession-which-r=/opt/conda/lib/R\nrsession-ld-library-path=/opt/conda/lib:/opt/conda/x86_64-conda-linux-gnu/lib/" >> /etc/rstudio/rserver.conf \
     && cd $cwd
 
-
 COPY srv /srv
 
-RUN pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
- && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
+RUN pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
  && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \
+# && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
  && chmod g+w /opt/conda/share/jupyter/lab/extensions \
+# && rm -rf /srv/jupyter*_proxy \
+ && echo
+
+ENV BASH_ENV ~/.bashrc
+SHELL ["/bin/bash", "-c"]
+
+RUN conda create -y -n py2 python=2.7 \
+ && conda init \
+ && source /opt/conda/etc/profile.d/conda.sh && source /home/jovyan/.bashrc \
+ && conda activate py2 \
+ && conda install -c conda-forge ipykernel \
+ && pip install backports.functools-lru-cache \
+ && python -m ipykernel install --name py2 --display-name "Python 2.7" \
+ && conda install -c anaconda tensorflow-gpu=1.7.0 matplotlib h5py numba pandas \
+ && conda deactivate
+
+
+# code-server
+RUN conda install -c conda-forge code-server \
+ && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
  && rm -rf /srv/jupyter*_proxy
 
 USER jovyan

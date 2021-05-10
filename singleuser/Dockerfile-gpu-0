@@ -18,8 +18,8 @@ RUN conda install -c conda-forge \
     code-server \
     imagemagick \
     openslide flask \
-#    visdom \
- && echo
+    visdom 
+    
 
 RUN pip3 install --no-cache-dir openslide-python
 
@@ -65,11 +65,20 @@ COPY srv /srv
 RUN pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
  && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
  && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \
- && chmod g+w /opt/conda/share/jupyter/lab/extensions
+ && chmod g+w /opt/conda/share/jupyter/lab/extensions \
+ && rm -rf /srv/jupyter*_proxy
+ENV BASH_ENV ~/.bashrc
+SHELL ["/bin/bash", "-c"]
 
-RUN pip3 install --no-cache-dir /srv/jupyter_visdom_proxy \
- && pip3 install --no-cache-dir /srv/visdom \
- && chmod -R g+w /opt/conda/lib/python3.8/site-packages/visdom
+RUN conda create -y -n py2 python=2.7 \
+ && conda init \
+ && source /opt/conda/etc/profile.d/conda.sh && source /home/jovyan/.bashrc \
+ && conda activate py2 \
+ && conda install -c conda-forge ipykernel \
+ && pip install backports.functools-lru-cache \
+ && python -m ipykernel install --name py2 --display-name "Python 2.7" \
+ && conda install -c anaconda tensorflow-gpu=1.7.0 \
+ && conda deactivate
 
 USER jovyan
 

@@ -353,6 +353,7 @@ if 'JUPYTERHUB_CRYPT_KEY' not in os.environ:
 
 pass
 
+'''
 # remove idle notebooks after inactive time
 # https://github.com/jupyterhub/jupyterhub-idle-culler
 import sys
@@ -363,6 +364,7 @@ c.JupyterHub.services = [
         'command': [sys.executable, '-m', 'jupyterhub_idle_culler', '--timeout=3600'],
     }
 ]
+'''
 
 # max simultaneous users
 c.JupyterHub.concurrent_spawn_limit = 10

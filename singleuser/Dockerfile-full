@@ -1,4 +1,4 @@
-FROM jupyter/datascience-notebook:lab-3.0.12
+FROM jupyter/datascience-notebook:lab-3.0.14
 # https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#core-stacks
 # https://hub.docker.com/r/jupyter/datascience-notebook/tags/?page=1&ordering=last_updated
 
@@ -6,7 +6,7 @@ FROM jupyter/datascience-notebook:lab-3.0.12
 #RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
 
 # jupyterhub: last version from github
-RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
+# RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
 
 USER root
 
@@ -14,10 +14,8 @@ RUN conda update -n base conda
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
     jupyter-rsession-proxy \
-    code-server \
     imagemagick \
     openslide flask \
-    visdom \
     bash \
     nano \
     git \
@@ -65,12 +63,31 @@ RUN cd /tmp \
 
 COPY srv /srv
 
-RUN pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
- && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
+RUN pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
  && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \
+# && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
 # && chmod g+w /opt/conda/share/jupyter/lab/extensions \
-# && rm -rf /srv/jupyter*_proxy
+# && rm -rf /srv/jupyter*_proxy \
  && echo
+
+ENV BASH_ENV ~/.bashrc
+SHELL ["/bin/bash", "-c"]
+
+RUN conda create -y -n py2 python=2.7 \
+ && conda init \
+ && source /opt/conda/etc/profile.d/conda.sh && source /home/jovyan/.bashrc \
+ && conda activate py2 \
+ && conda install -c conda-forge ipykernel \
+ && pip install backports.functools-lru-cache \
+ && python -m ipykernel install --name py2 --display-name "Python 2.7" \
+ && conda install -c anaconda matplotlib h5py numba pandas \
+ && conda deactivate
+
+
+# code-server
+RUN conda install -c conda-forge code-server \
+ && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
+ && rm -rf /srv/jupyter*_proxy
 
 USER jovyan
 
