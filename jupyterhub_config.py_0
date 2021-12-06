@@ -6,8 +6,8 @@ import os
 
 # pre-spawn settings
 
-NB_UID = 65534
-NB_GID = 65534
+NB_UID = 1001
+NB_GID = 100
 
 CUDA = 'cuda' in os.environ['HOSTNODE']  
 
@@ -84,56 +84,29 @@ def set_sudo(spawner):
     else:
         return 'no'
 
-def set_USER(spawner):
-    username = spawner.user.name
-    if username[0:4].isnumeric():
-        return username.upper()
-    else:
-        return username
-
-def set_HOME(spawner):
-    return '/home/' + spawner.user.name
-
-def set_UID(spawner):
-    UID = cfg['users'][spawner.user.name][0]['uid']
-    if UID >= 1 and UID < 65536:
-        return UID
-    else:
-        return 1000
-
-def set_GID(spawner):
-    GID = cfg['users'][spawner.user.name][1]['gid']
-    if GID >= 1 and GID < 65536:
-        return GID
-    else:
-        return 100
-
 c.DockerSpawner.environment = {
-'NB_USER': set_USER,
-'NB_UID': set_UID,
-'NB_GID': set_GID,
+'NB_USER':'jovyan',
+'NB_UID': NB_UID,
+'NB_GID': NB_GID,
 'NB_UMASK':'002',
 'CHOWN_HOME':'yes',
 'GRANT_SUDO': set_sudo, 
 }
 
 home_dir = os.environ.get('HOME_DIR')
+notebook_dir = '/home/jovyan'
 
-# notebook_dir = '/home/' + spawner.user.name
-# c.DockerSpawner.notebook_dir = notebook_dir
-
+c.DockerSpawner.notebook_dir = notebook_dir
 
 from dockerspawner import DockerSpawner
 class CustomDockerSpawner(DockerSpawner):
     
     # mount volumes by team
     def start(self):
-#        username = self.user.name
-        username = set_USER(self)
+        username = self.user.name
 
-        # home dir
         self.volumes[f"{home_dir}/{username.split('@')[0]}"] = {
-            'bind': '/home/' + username ,
+            'bind': notebook_dir,
             'mode': 'rw',
         }
 
@@ -142,7 +115,6 @@ class CustomDockerSpawner(DockerSpawner):
             'bind': '/tmp/group',
             'mode': 'ro',
         }
-
         # config_running
         self.volumes[os.environ['CONFIG_RUNNING']] = {
             'bind': '/tmp/config_running.sh',
@@ -154,14 +126,14 @@ class CustomDockerSpawner(DockerSpawner):
             'mode': 'ro',
         }
 
-        teams = cfg['users'][self.user.name] # lowercase
+        teams = cfg['users'][username]
         mounts = cfg['mounts']
 
         mounts = {k:v for k,v in mounts.items() if k in teams }
 
         for k,v in mounts.items():
             for h,d in v.items():
-                self.volumes[h] = { 'bind': d[0].replace('USER',username), 'mode': d[1] }
+                self.volumes[h] = { 'bind': d[0], 'mode': d[1] }
            
 
         return super().start()
@@ -318,38 +290,59 @@ from oauthenticator.google import GoogleOAuthenticator
 from nativeauthenticator import NativeAuthenticator
 #from oauthenticator.azuread  import AzureAdOAuthenticator
 
-c.MultiOAuthenticator.authenticators = [
-    (GitHubOAuthenticator, '/github', {
-        'client_id': os.environ['GITHUB_CLIENT_ID'],
-        'client_secret': os.environ['GITHUB_CLIENT_SECRET'],
-        'oauth_callback_url': os.environ['GITHUB_CALLBACK_URL']
-    }),
-    (GoogleOAuthenticator, '/google', {
-        'client_id': os.environ['GOOGLE_CLIENT_ID'],
-        'client_secret': os.environ['GOOGLE_CLIENT_SECRET'],
-        'oauth_callback_url': os.environ['GOOGLE_CALLBACK_URL'],
-        'login_service': 'Google'
-    }),
-    (NativeAuthenticator, '/', {
-        'login_service': 'User/Pass'
-    }),
-]
+if CUDA:
+    c.MultiOAuthenticator.authenticators = [
+        (GitHubOAuthenticator, '/github', {
+            'client_id': os.environ['GITHUB_CLIENT_ID'],
+            'client_secret': os.environ['GITHUB_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['GITHUB_CALLBACK_URL']
+        }),
+        (GoogleOAuthenticator, '/google', {
+            'client_id': os.environ['GOOGLE_CLIENT_ID'],
+            'client_secret': os.environ['GOOGLE_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['GOOGLE_CALLBACK_URL'],
+            'login_service': 'Google'
+        }),
+        (NativeAuthenticator, '/', {
+            'login_service': 'User/Pass'
+        }),
+    #    (AzureAdOAuthenticator, '/microsoft', {
+    #        'client_id': os.environ['AZURE_CLIENT_ID'],
+    #        'client_secret': os.environ['AZURE_CLIENT_SECRET'],
+    #        'oauth_callback_url': os.environ['AZURE_CALLBACK_URL'],
+    #        'tenant_id': os.environ['AZURE_TENANT_ID'],
+    #        'login_service': 'Microsoft'
+    #    })
+    ]
+else:
+    c.MultiOAuthenticator.authenticators = [
+        (GitHubOAuthenticator, '/github', {
+            'client_id': os.environ['DGITHUB_CLIENT_ID'],
+            'client_secret': os.environ['DGITHUB_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['DGITHUB_CALLBACK_URL']
+        }),
+        (GoogleOAuthenticator, '/google', {
+            'client_id': os.environ['DGOOGLE_CLIENT_ID'],
+            'client_secret': os.environ['DGOOGLE_CLIENT_SECRET'],
+            'oauth_callback_url': os.environ['DGOOGLE_CALLBACK_URL'],
+            'login_service': 'Google'
+        }),
+        (NativeAuthenticator, '/', {
+            'login_service': 'User/Pass'
+        }),
+    ]
         
 import nativeauthenticator
 c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}/templates/"]
 #  ["/usr/local/lib/python3.8/dist-packages/nativeauthenticator/templates/"]
-# to do:
-#       pip install nativeauthenticator
-#	copy templates to /rv/templates
-#	modify native-login.html to allow github/google logins
-#	c.JupyterHub.template_paths = [ "/srv/templates"]
-
 
 # google
 # https://oauthenticator.readthedocs.io/en/latest/api/gen/oauthenticator.google.html
-c.GoogleOAuthenticator.hosted_domain = ['gmail.com']
+c.GoogleOAuthenticator.hosted_domain = ['gmail.com','morenoaguado.net']
 c.GoogleOAuthenticator.login_service = 'Google'
 c.GoogleOAuthenticator.delete_invalid_users = True
+# c.GoogleOAuthenticator.allowed_users = {'victor.r.moreno@gmail.com'}
+# c.GoogleOAuthenticator.allowed_google_groups = {'uic'}
 
 c.NativeAuthenticator.check_common_password = True
 c.NativeAuthenticator.minimum_password_length = 8

@@ -5,21 +5,7 @@
 version: "2"
 
 services:
-  hub-db:
-    image: postgres:9.5
-    container_name: jupyterhub-db
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: ${DB_VOLUME_CONTAINER}
-    env_file:
-      - secrets/postgres.env
-    volumes:
-      - "db:${DB_VOLUME_CONTAINER}"
-
   hub:
-    depends_on:
-      - hub-db
     build:
       context: .
       dockerfile: Dockerfile
@@ -33,46 +19,24 @@ services:
       # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
-      - "data:${DATA_VOLUME_CONTAINER}"
+      - ${HOME_DIR}/cookie:/data
       # config
       - ${JUPYTERHUB_CONFIG}:/srv/jupyterhub/jupyterhub_config.py
       # user & image list
       - ${USER_LIST}:/srv/jupyterhub/config.yaml
-    # ports:
-    #   - "12000:443"
-    links:
-      - hub-db
     environment:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
-      # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: ${LOCAL_NOTEBOOK_IMAGE}
-      # Notebook directory inside user image
-      DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
-      # Using this run command (optional)
-      DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
-      # Postgres db info
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: hub-db
       # proxy
       CONFIGPROXY_AUTH_TOKEN: ${CONFIGPROXY_AUTH_TOKEN}
-      # user volumes
+      JHUB_DIR: ${JHUB_DIR}
       HOME_DIR: ${HOME_DIR}
-      #
       HOSTNODE: ${HOSTNAME}
+      CONFIG_RUNNING: ${CONFIG_RUNNING}
     env_file:
-      - secrets/postgres.env
-      - secrets/oauth.env
+      - ${OAUTH}
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
-
-volumes:
-  data:
-    external:
-      name: ${DATA_VOLUME_HOST}
-  db:
-    external:
-      name: ${DB_VOLUME_HOST}
 
 networks:
   default:

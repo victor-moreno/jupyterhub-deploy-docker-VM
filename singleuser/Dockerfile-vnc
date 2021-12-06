@@ -1,10 +1,5 @@
 FROM jupyter/minimal-notebook
 
-ARG JUPYTERIMG_VERSION
-
-# jupyterhub: last version from github
-# RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
-
 USER root
 
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -25,8 +20,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && rm -rf /var/lib/apt/lists/*
 
 # https://github.com/mathworks-ref-arch/matlab-integration-for-jupyter/blob/main/matlab-vnc/Dockerfile
-# Install tigervnc to /usr/local
-RUN curl -sSfL 'https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-1.10.0.x86_64.tar.gz' \
+# Install tigervnc 1.10 to /usr/local !! 1.11 not working
+RUN curl -sSfL 'https://sourceforge.net/projects/tigervnc/files/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz/download' \
     | tar -zxf - -C /usr/local --strip=2
 
 # Get noVNC
@@ -40,24 +35,16 @@ RUN mkdir -p ${NOVNC_PATH} \
 RUN conda install -c conda-forge websockify=0.9.0 \
     jupyter-server-proxy pyyaml \
     bash nano \
-    lxml pyqt \
-    openslide flask Pillow 
-
-# labelImg
-RUN cd /tmp \
- && git clone https://github.com/tzutalin/labelImg \
- && cd labelImg \
- && make qt5py3 \
- && pip3 install . \
- && cd && rm -rf /tmp/labelImg
+    openslide openslide-python flask \
+    Pillow labelimg
 
 COPY srv /srv
 
-RUN pip3 install --no-cache-dir /srv/jupyter_labelimg_proxy \
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /srv/jupyter_labelimg_proxy \
  && cp /srv/jupyter_labelimg_proxy/jupyter_labelimg_proxy/resources/novnc_lite.html /opt/noVNC/index.html \
  && chown -R ${NB_USER}:users /opt/noVNC/index.html && chmod 755 /opt/noVNC/index.html \
  && cp /srv/jupyter_labelimg_proxy/jupyter_labelimg_proxy/resources/user-dirs.defaults /etc/xdg/user-dirs.defaults \
- && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy 
+ && pip3 install --no-cache-dir --use-feature=in-tree-build /srv/jupyter_deepzoom_proxy
 
 USER $NB_USER
 

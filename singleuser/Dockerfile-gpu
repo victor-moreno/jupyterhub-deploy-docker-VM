@@ -1,4 +1,4 @@
-FROM cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
+FROM cschranz/gpu-jupyter:latest
 
 # jupyterhub: last version from github
 #RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
@@ -8,17 +8,15 @@ USER root
 RUN conda update -n base conda
 RUN conda update -c conda-forge -y notebook jupyterhub jupyterlab ipywidgets
 
-# COPY nvtop /usr/local/bin/nvtop
-
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
     jupyter-rsession-proxy \
     imagemagick \
-    openslide flask
+    openslide openslide-python flask
     
 RUN jupyter labextension install jupyterlab-plotly @jupyter-widgets/jupyterlab-manager plotlywidget @ijmbarr/jupyterlab_spellchecker
 
-RUN pip3 install --no-cache-dir openslide-python
+# RUN pip3 install --no-cache-dir openslide-python
 
 # rstudio
 RUN apt-get update && apt-get -y --no-install-recommends install \
@@ -43,7 +41,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
 
 #ENV RSTUDIO_VERSION=1.4.1106 not working
 ENV RSTUDIO_VERSION=1.3.959
-ENV LINUX=xenial
+ENV LINUX=bionic
 # xenial: ubuntu 16  bionic: ubuntu 18/20
 
 # wget https://download2.rstudio.org/server/${LINUX}/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
@@ -56,35 +54,55 @@ RUN cd /tmp \
     && echo -e "rsession-which-r=/opt/conda/lib/R\nrsession-ld-library-path=/opt/conda/lib:/opt/conda/x86_64-conda-linux-gnu/lib/" >> /etc/rstudio/rserver.conf \
     && cd $cwd
 
+
+# code-server
+RUN conda install -c conda-forge code-server
+
+USER $NB_USER
+
+
+RUN pip3 install jupyterlab-logout
+
 COPY srv /srv
 
-RUN pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
- && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \
-# && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
- && chmod g+w /opt/conda/share/jupyter/lab/extensions \
-# && rm -rf /srv/jupyter*_proxy \
- && echo
+RUN pip3 install --upgrade pip  
+RUN cp -r /srv /tmp/srv \
+ && pip3 install --no-cache-dir /tmp/srv/jupyter_tensorboard_proxy \
+ && pip3 install --no-cache-dir /tmp/srv/jupyter_deepzoom_proxy \
+ && pip3 install --no-cache-dir /tmp/srv/jupyterlab-control \
+ && pip3 install --no-cache-dir /tmp/srv/jupyter_via_proxy \
+ && pip3 install --no-cache-dir /tmp/srv/jupyter_codeserver_proxy \
+ && rm -rf /tmp/srv \
+ && chmod +w /opt/conda/
+
+# radiomics
+RUN conda install -c conda-forge pydicom && \
+    pip3 install --no-cache-dir pyradiomics
+
+
+# RUN pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
+#  && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \
+#  && pip3 install --no-cache-dir /srv/jupyter_via_proxy \
+# # && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
+#  && chmod g+w /opt/conda/share/jupyter/lab/extensions \
+# # && rm -rf /srv/jupyter*_proxy \
+#  && echo
 
 ENV BASH_ENV ~/.bashrc
 SHELL ["/bin/bash", "-c"]
 
-RUN conda create -y -n py2 python=2.7 \
- && conda init \
- && source /opt/conda/etc/profile.d/conda.sh && source /home/jovyan/.bashrc \
- && conda activate py2 \
- && conda install -c conda-forge ipykernel \
- && pip install backports.functools-lru-cache \
- && python -m ipykernel install --name py2 --display-name "Python 2.7" \
- && conda install -c anaconda tensorflow-gpu=1.7.0 matplotlib h5py numba pandas \
- && conda deactivate
+# RUN conda create -y -n py2 python=2.7 \
+#  && conda init \
+#  && source /opt/conda/etc/profile.d/conda.sh && source /home/jovyan/.bashrc \
+#  && conda activate py2 \
+#  && conda install -c conda-forge ipykernel \
+#  && pip install backports.functools-lru-cache \
+#  && python -m ipykernel install --name py2 --display-name "Python 2.7" \
+#  && conda install -c anaconda tensorflow-gpu=1.7.0 matplotlib h5py numba pandas \
+#  && conda deactivate
 
+COPY nvtop /usr/local/bin/nvtop
 
-# code-server
-RUN conda install -c conda-forge code-server \
- && pip3 install --no-cache-dir /srv/jupyter_codeserver_proxy \
- && rm -rf /srv/jupyter*_proxy
-
-USER jovyan
 
 ENV START=/lab
 
