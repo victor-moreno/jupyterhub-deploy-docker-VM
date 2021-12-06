@@ -1,12 +1,13 @@
-FROM jupyter-minimal
+FROM jupyter/minimal-notebook
 
-RUN conda install -c conda-forge openslide flask Pillow pyyaml \
+RUN conda install -c conda-forge openslide openslide-python flask Pillow pyyaml \
     jupyter-server-proxy
 
 COPY srv /srv
 
-RUN pip3 install --no-cache-dir openslide-python \
- && pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy
+RUN pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy
 
 ENV START=/deepzoom
 
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

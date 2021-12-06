@@ -1,14 +1,22 @@
 FROM jupyter/minimal-notebook
 
-ARG JUPYTERIMG_VERSION
+# ARG JUPYTERIMG_VERSION
 
 # jupyterhub: last version from github
 # RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
 
 USER $NB_USER
 
+RUN pip3 install --upgrade pip  
+
 ENV START=/lab
 
 COPY srv /srv
+
+RUN pip3 install jupyterlab-logout
+RUN cp -r /srv/jupyterlab-control /tmp/jupyterlab-control && \
+    pip3 install --no-cache-dir /tmp/jupyterlab-control && \
+    rm -rf /tmp/jupyterlab-control
+
 ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
 CMD ["start-singleuser.sh"]

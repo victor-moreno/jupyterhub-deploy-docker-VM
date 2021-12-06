@@ -1,11 +1,5 @@
 FROM jupyter/r-notebook:latest
 
-# ARG JUPYTERHUB_VERSION
-# RUN   python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
-
-# jupyterhub: last version from github
-RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install --no-cache-dir /tmp/jupyterhub && rm -rf /tmp/jupyterhub
-
-# COPY srv /srv
-# ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
-# CMD ["start-singleuser.sh"]
+COPY srv /srv
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

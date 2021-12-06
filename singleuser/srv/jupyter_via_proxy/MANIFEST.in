@@ -1,0 +1,4 @@
+include README.rst
+include via
+include icons/via.svg
+include templates/via.html

@@ -3,10 +3,10 @@ data
 native
 secrets
 singleuser/gpu-jupyter
-singleuser/lab
-singleuser/nvtop
 singleuser/rstudio
+singleuser/vnc
 singleuser/srv/visdom
 singleuser/srv/jamovi
 singleuser/srv/jupyter-rsession-proxy
+singleuser/nvtop
 .vscode

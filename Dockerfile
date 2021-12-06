@@ -5,11 +5,11 @@ ARG JUPYTERHUB_VERSION
 FROM jupyterhub/jupyterhub-onbuild:$JUPYTERHUB_VERSION
 
 # postgress
-RUN apt-get update && apt-get install -y libpq-dev git \
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && /usr/bin/python3 -m pip install --upgrade pip \
-    && pip3 install --no-cache-dir psycopg2-binary
+# RUN apt-get update && apt-get install -y libpq-dev git \
+#     && apt-get autoremove -y \
+#     && apt-get clean -y \
+#     && /usr/bin/python3 -m pip install --upgrade pip \
+#     && pip3 install --no-cache-dir psycopg2-binary
 
 # # Copy TLS certificate and key
 # ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
@@ -20,10 +20,12 @@ RUN apt-get update && apt-get install -y libpq-dev git \
 #     chmod 600 /srv/jupyterhub/secrets/*
 
 # Install dockerspawner, oauth
-RUN pip3 install --no-cache-dir dockerspawner oauthenticator \
+RUN /usr/bin/python3 -m pip install --upgrade pip \
+    pip install --no-cache-dir dockerspawner oauthenticator \
     jupyterhub-idle-culler PyJWT pyyaml
 
 # RUN cd /tmp && git clone https://github.com/jupyterhub/nativeauthenticator.git && pip3 install /tmp/nativeauthenticator && rm -rf /tmp/nativeauthenticator
+# templates/native-login.html modified to allow github/google oauth
 COPY native /tmp/native
-RUN cd /tmp/native && pip3 install . && cd / && rm -rf /tmp/native
+RUN cd /tmp/native && pip install . --use-feature=in-tree-build && cd / && rm -rf /tmp/native
 
