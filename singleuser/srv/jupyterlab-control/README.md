@@ -2,7 +2,6 @@
 
 ## modified from https://github.com/jupyterlab-contrib/jupyterlab-logout
 
-![Github Actions Status](https://github.com/jupyterlab-contrib/jupyterlab-control.git/workflows/Build/badge.svg)
 
 Control Panel Button for JupyterLab
 
@@ -11,12 +10,6 @@ Control Panel Button for JupyterLab
 ## Requirements
 
 * JupyterLab >= 3.0
-
-## Install
-
-```bash
-pip install jupyterlab-control
-```
 
 
 ## Contributing
@@ -57,8 +50,3 @@ By default, the `jlpm run build` command generates the source maps for this exte
 jupyter lab build --minimize=False
 ```
 
-### Uninstall
-
-```bash
-pip uninstall jupyterlab-control
-```
