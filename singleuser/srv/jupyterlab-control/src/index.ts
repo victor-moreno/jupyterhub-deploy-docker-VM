@@ -17,13 +17,13 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [IRouter, ITopBar],
   activate: async (app: JupyterFrontEnd, router: IRouter, topBar: ITopBar) => {
-    const logout = document.createElement('a');
-    logout.id = 'control';
-    logout.innerHTML = 'Control';
-    logout.addEventListener('click', () => {
+    const control = document.createElement('a');
+    control.id = 'control';
+    control.innerHTML = 'Control';
+    control.addEventListener('click', () => {
       router.navigate('../../home', { hard: true }); });
       
-    const widget = new Widget({ node: logout });
+    const widget = new Widget({ node: control });
     widget.addClass('jp-Button-flat');
     topBar.addItem('control-button', widget);
   }
