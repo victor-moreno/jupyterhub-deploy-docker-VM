@@ -10,6 +10,10 @@ RUN pip3 install --no-cache-dir dockerspawner oauthenticator \
 
 # RUN cd /tmp && git clone https://github.com/jupyterhub/nativeauthenticator.git && pip3 install /tmp/nativeauthenticator && rm -rf /tmp/nativeauthenticator
 # templates/native-login.html modified to allow github/google oauth
+
 COPY native /tmp/native
-RUN cd /tmp/native && pip3 install . --use-feature=in-tree-build && cd / && rm -rf /tmp/native
+RUN pip3 install /tmp/native && rm -rf /tmp/native
+
+# RUN pip3 install jupyterhub-nativeauthenticator
+# RUN sed -i 's+</a></p>+</a></p></div><div style="padding-top: 25px;"><p>Login with <a href="{{ base_url }}github/oauth_login">GitHub</a> or <a href="{{ base_url }}google/oauth_login">Google</a></p>+' /usr/local/lib/python3.8/dist-packages/nativeauthenticator/templates/native-login.html
 

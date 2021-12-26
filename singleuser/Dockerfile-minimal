@@ -1,25 +1,26 @@
-FROM jupyter/minimal-notebook
+# FROM jupyter/minimal-notebook:hub-2.0.0
 
-USER $NB_USER
+# USER $NB_USER
 
-RUN conda install -c conda-forge jupyterhub=1.4.2
+# # downgrade 
+# RUN conda install -c conda-forge jupyterhub=1.4.2
 
-ENV START=/lab
+# ENV START=/lab
 
-COPY --chown=1000:100 srv/jupyterlab-logout /tmp/jupyterlab-logout
-RUN pip3 install --no-cache-dir --use-feature=in-tree-build /tmp/jupyterlab-logout && \
-    rm -rf /tmp/jupyterlab-logout
+# # modified to include control
+# COPY --chown=1000:100 srv/jupyterlab-logout /tmp/jupyterlab-logout
+# RUN pip3 install --no-cache-dir /tmp/jupyterlab-logout && \
+#     rm -rf /tmp/jupyterlab-logout
 
-RUN pip3 install jupyterlab-system-monitor 
+# RUN pip3 install jupyterlab-system-monitor 
 
-RUN conda install -c conda-forge jupyterlab-drawio 
+# RUN conda install -c conda-forge jupyterlab-drawio 
 
-# RUN conda install -c conda-forge jupyterlab-unfold 
-# RUN conda install -c conda-forge jupyter-archive 
 # RUN conda install -c conda-forge jupyterlab-favorites
-# RUN pip3 install jupyterlab-spreadsheet-editor 
-# RUN pip3 install lckr-jupyterlab-variableinspector
+# # RUN pip3 install jupyterlab-spreadsheet-editor 
+# # RUN pip3 install lckr-jupyterlab-variableinspector
 
-COPY srv/docker-entrypoint.sh /srv/docker-entrypoint.sh
-ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
-CMD ["start-singleuser.sh"]
+# ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+# CMD ["start-singleuser.sh"]
+
+FROM jupyter-cuda

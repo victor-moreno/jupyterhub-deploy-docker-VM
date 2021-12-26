@@ -41,7 +41,7 @@ COPY rstudio/${LINUX}/rstudio-server-${RSTUDIO_VERSION}-amd64.deb /tmp/
 RUN cd /tmp \
     && dpkg -i rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
     && rm rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
-    && echo "USER=NB_USER" >> /etc/environment \
+    && echo "USER=$NB_USER" >> /etc/environment \
     && echo -e "rsession-which-r=/opt/conda/lib/R\nrsession-ld-library-path=/opt/conda/lib:/opt/conda/x86_64-conda-linux-gnu/lib/" >> /etc/rstudio/rserver.conf \
     && cd $cwd
 
@@ -57,3 +57,4 @@ ENV START=/rstudio
 
 RUN conda install -c bioconda plink plink2 vcftools perl-vcftools-vcf bcftools p7zip 
     
+
