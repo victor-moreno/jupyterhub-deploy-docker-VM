@@ -1,0 +1,26 @@
+FROM jupyter/minimal-notebook
+
+RUN conda install -c conda-forge \
+    jupyterhub=1.4.2 \
+    jupyter-server-proxy \
+    pyyaml
+
+# openrefine
+RUN conda install -c conda-forge openrefine && \
+    sed -i 's/return/return true \/\//' /opt/conda/opt/openrefine/webapp/modules/core/scripts/index/default-importing-sources/sources.js && \
+    echo -e '#!/bin/bash\n/opt/conda/opt/openrefine/refine "$@"' > /opt/conda/bin/refine
+
+COPY --chown=1000:100 srv/jupyter_openrefine_proxy /tmp/jupyter_openrefine_proxy
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /tmp/jupyter_openrefine_proxy && \
+    rm -rf /tmp/jupyter_openrefine_proxy
+
+COPY --chown=1000:100 srv/jupyterlab-logout /tmp/jupyterlab-logout
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /tmp/jupyterlab-logout && \
+    rm -rf /tmp/jupyterlab-logout
+
+RUN pip3 install jupyterlab-system-monitor 
+
+ENV START=/lab
+
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

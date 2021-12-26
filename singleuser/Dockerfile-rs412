@@ -1,0 +1,59 @@
+FROM jupyter-r412
+ENV RVER=R4.1.2
+
+# rstudio
+
+RUN conda install -c conda-forge \
+    jupyter-server-proxy \
+    jupyter-rsession-proxy \
+    bash \
+    nano \
+    git \
+    wget \
+    r-r.utils
+
+USER root
+
+RUN apt-get update --yes && apt-get install --yes --no-install-recommends \
+    file \
+    libapparmor1 \
+    libgc1c2 \
+    libclang-dev \
+    libcurl4-openssl-dev \
+    libedit2 \
+    libobjc4 \
+    libssl-dev \
+    libpq5 \
+    lsb-release \
+    psmisc \
+    procps \
+    python-setuptools \
+    sudo \
+    openssh-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists
+
+ARG RSTUDIO_VERSION=2021.09.1-372
+ARG LINUX=bionic
+# xenial: ubuntu 16  bionic: ubuntu 18/20
+# wget https://download2.rstudio.org/server/${LINUX}/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb 
+
+COPY rstudio/${LINUX}/rstudio-server-${RSTUDIO_VERSION}-amd64.deb /tmp/
+RUN cd /tmp \
+    && dpkg -i rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
+    && rm rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
+    && echo "USER=$NB_USER" >> /etc/environment \
+    && echo -e "rsession-which-r=/opt/conda/lib/R\nrsession-ld-library-path=/opt/conda/lib:/opt/conda/x86_64-conda-linux-gnu/lib/" >> /etc/rstudio/rserver.conf \
+    && cd $cwd
+
+USER $NB_USER
+
+COPY --chown=1000:100 srv/jupyter-rsession-proxy /tmp/jupyter-rsession-proxy
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /tmp/jupyter-rsession-proxy && \
+    rm -rf /tmp/jupyter-rsession-proxy
+
+ENV START=/rstudio
+
+# additional tools
+
+RUN conda install -c bioconda plink plink2 vcftools perl-vcftools-vcf bcftools p7zip 
+

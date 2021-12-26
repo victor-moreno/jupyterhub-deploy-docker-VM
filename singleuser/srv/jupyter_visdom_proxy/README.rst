@@ -1,5 +1,7 @@
 jupyter visdom proxy
 
+proxy app not working (211226)
+
 Adds a proxy service to jupyterlab to open visdom
     https://github.com/fossasia/visdom
 

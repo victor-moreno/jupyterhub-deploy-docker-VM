@@ -54,6 +54,7 @@ def get_options_form(spawner):
         images = images | i.items()
     
     allowed_images = dict(images)
+    allowed_images = dict(sorted(allowed_images.items(), key=lambda x: x[0]))
 
     # prepare form
     if len(allowed_images) > 1:
@@ -120,7 +121,7 @@ c.DockerSpawner.environment = {
 home_dir = os.environ.get('HOME_DIR')
 
 # notebook_dir = '/home/' + spawner.user.name
-# c.DockerSpawner.notebook_dir = notebook_dir
+# c.DockerSpawner.notebook_dir = notebook_dir
 
 
 from dockerspawner import DockerSpawner
@@ -143,14 +144,9 @@ class CustomDockerSpawner(DockerSpawner):
             'mode': 'ro',
         }
 
-        # config_running
-        self.volumes[os.environ['CONFIG_RUNNING']] = {
-            'bind': '/tmp/config_running.sh',
-            'mode': 'ro',
-        }
-        # temporary: not needed when containers are rebuilt
-        self.volumes[os.environ['JHUB_DIR']+'/singleuser/srv/docker-entrypoint.sh'] = {
-            'bind': '/srv/docker-entrypoint.sh',
+        # srv
+        self.volumes[os.environ['JHUB_DIR']+'/singleuser/srv/setup'] = {
+            'bind': '/srv',
             'mode': 'ro',
         }
 

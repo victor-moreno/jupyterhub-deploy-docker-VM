@@ -5,8 +5,8 @@ FROM cschranz/gpu-jupyter:latest
 
 USER root
 
-RUN conda update -n base conda
-RUN conda update -c conda-forge -y notebook jupyterhub jupyterlab ipywidgets
+# RUN conda update -n base conda
+# RUN conda update -c conda-forge -y notebook jupyterhub jupyterlab ipywidgets
 
 RUN conda install -c conda-forge \
     jupyter-server-proxy \
@@ -79,6 +79,11 @@ RUN cp -r /srv /tmp/srv \
 RUN conda install -c conda-forge pydicom && \
     pip3 install --no-cache-dir pyradiomics
 
+# torch
+RUN pip install --no-cache-dir torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html 
+# && \
+#     fix-permissions "${CONDA_DIR}" && \
+#     fix-permissions "/home/${NB_USER}"
 
 # RUN pip3 install --no-cache-dir /srv/jupyter_deepzoom_proxy \
 #  && pip3 install --no-cache-dir /srv/jupyter_tensorboard_proxy \

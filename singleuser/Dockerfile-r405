@@ -1,0 +1,14 @@
+FROM jupyter/r-notebook:r-4.0.5
+ENV RVER=R4.0.5
+
+RUN conda install -c conda-forge jupyterhub=1.4.2 
+
+RUN pip3 install jupyterlab-system-monitor 
+
+COPY --chown=1000:100 srv/jupyterlab-logout /tmp/jupyterlab-logout
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /tmp/jupyterlab-logout && \
+    rm -rf /tmp/jupyterlab-logout
+
+COPY srv/docker-entrypoint.sh /srv/docker-entrypoint.sh
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

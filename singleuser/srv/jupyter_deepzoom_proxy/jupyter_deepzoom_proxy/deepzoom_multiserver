@@ -137,7 +137,8 @@ def index():
         page = render_template('files.html', 
                 root_dir=_Directory(app.basedir), 
                 base_url=app.config['BASE_URL'], 
-                logout= app.config['BASE_URL'].replace('deepzoom','logout')
+                logout= app.config['BASE_URL'].replace('deepzoom','logout'),
+                lab= app.config['BASE_URL'].replace('deepzoom','lab')
                 )
         with open(path, 'w') as f:
             f.write(page)

@@ -1,5 +1,0 @@
-FROM jupyter/r-notebook:latest
-
-COPY srv /srv
-ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
-CMD ["start-singleuser.sh"]

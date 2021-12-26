@@ -1,5 +1,7 @@
 jupyter VIA proxy
 
+proxy app not workking (211226)
+
 Adds a proxy service to jupyterlab to annotate images with VGG Image Annotator
 
 This package is an interface to VGG Image Annotator

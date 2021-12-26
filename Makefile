@@ -6,11 +6,14 @@ include .env
 network:
 	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network create $(DOCKER_NETWORK_NAME)
 
+imageM:
+	docker build -t jupyter-minimal \
+	    --file singleuser/Dockerfile-minimal \
+		singleuser
+
 imageG:
 	docker build -t jupyter-gpu \
 	    --file singleuser/Dockerfile-gpu \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
 
 imageC:
@@ -21,38 +24,35 @@ imageT:
 	docker build -t jupyter-torch \
 	    --file singleuser/Dockerfile-torch \
 		singleuser
-imageR:
-	docker build -t jupyter-r \
-	    --file singleuser/Dockerfile-r \
-		singleuser
-imageD:
-	docker build -t jupyter-devel \
-	    --file singleuser/Dockerfile-devel \
-		singleuser
 
-imageRS:
-	docker build -t jupyter-rstudio \
-	    --file singleuser/Dockerfile-rs \
+imageR363:
+	docker build -t jupyter-r363 \
+	    --file singleuser/Dockerfile-r363 \
 		singleuser
-
-imageRStudio:
-	docker build -t jupyter-rstudio \
-	    --file singleuser/Dockerfile-rstudio \
+imageRS363:
+	docker build -t jupyter-rs363 \
+	    --file singleuser/Dockerfile-rs363 \
 		singleuser
-
-imageRSlatest:
-	docker build -t jupyter-rstudio \
-	    --file singleuser/Dockerfile-rslatest \
+imageR405:
+	docker build -t jupyter-r405 \
+	    --file singleuser/Dockerfile-r405 \
+		singleuser
+imageRS405:
+	docker build -t jupyter-rs405 \
+	    --file singleuser/Dockerfile-rs405 \
+		singleuser
+imageR412:
+	docker build -t jupyter-r412 \
+	    --file singleuser/Dockerfile-r412 \
+		singleuser
+imageRS412:
+	docker build -t jupyter-rs412 \
+	    --file singleuser/Dockerfile-rs412 \
 		singleuser
 
 imageS:
 	docker build -t jupyter-snpimpute \
 	    --file singleuser/Dockerfile-snpimpute \
-		singleuser
-
-imageM:
-	docker build -t jupyter-minimal \
-	    --file singleuser/Dockerfile-minimal \
 		singleuser
 
 imageZ:
@@ -65,14 +65,24 @@ imageF:
 	    --file singleuser/Dockerfile-full \
 		singleuser
 
-imageP:
-	docker build -t jupyter-pgweb \
-	    --file singleuser/Dockerfile-pgweb \
-		singleuser
-
 imageV:
 	docker build -t jupyter-vnc \
 	    --file singleuser/Dockerfile-vnc \
+		singleuser
+
+imageRefine:
+	docker build -t jupyter-refine \
+	    --file singleuser/Dockerfile-refine \
+		singleuser
+
+imageN:
+	docker build -t jupyter-nvidia \
+	    --file singleuser/Dockerfile-nvidia \
+		singleuser
+
+imageD:
+	docker build -t jupyter-devel \
+	    --file singleuser/Dockerfile-devel \
 		singleuser
 
 proxy:

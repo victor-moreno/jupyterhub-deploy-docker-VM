@@ -1,22 +1,25 @@
 FROM jupyter/minimal-notebook
 
-# ARG JUPYTERIMG_VERSION
-
-# jupyterhub: last version from github
-# RUN cd /tmp && git clone https://github.com/jupyterhub/jupyterhub && pip install /tmp/jupyterhub && rm -rf /tmp/jupyterhub
-
 USER $NB_USER
 
-RUN pip3 install --upgrade pip  
+RUN conda install -c conda-forge jupyterhub=1.4.2
 
 ENV START=/lab
 
-COPY srv /srv
+COPY --chown=1000:100 srv/jupyterlab-logout /tmp/jupyterlab-logout
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /tmp/jupyterlab-logout && \
+    rm -rf /tmp/jupyterlab-logout
 
-RUN pip3 install jupyterlab-logout
-RUN cp -r /srv/jupyterlab-control /tmp/jupyterlab-control && \
-    pip3 install --no-cache-dir /tmp/jupyterlab-control && \
-    rm -rf /tmp/jupyterlab-control
+RUN pip3 install jupyterlab-system-monitor 
 
+RUN conda install -c conda-forge jupyterlab-drawio 
+
+# RUN conda install -c conda-forge jupyterlab-unfold 
+# RUN conda install -c conda-forge jupyter-archive 
+# RUN conda install -c conda-forge jupyterlab-favorites
+# RUN pip3 install jupyterlab-spreadsheet-editor 
+# RUN pip3 install lckr-jupyterlab-variableinspector
+
+COPY srv/docker-entrypoint.sh /srv/docker-entrypoint.sh
 ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
 CMD ["start-singleuser.sh"]

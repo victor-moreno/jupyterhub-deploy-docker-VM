@@ -6,7 +6,7 @@ set -e
 
 if [ "$(which "$1")" = "/usr/local/bin/start-singleuser.sh" ]; then
 
-   [[ -f /tmp/config_running.sh ]] && . /tmp/config_running.sh
+   [[ -f /srv/config_running.sh ]] && . /srv/config_running.sh
 
 fi
 
