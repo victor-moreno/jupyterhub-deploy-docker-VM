@@ -144,12 +144,13 @@ class CustomDockerSpawner(DockerSpawner):
             'mode': 'ro',
         }
 
-        # srv
+        # mount /srv from files in /singleuser/srv/setup
         self.volumes[os.environ['JHUB_DIR']+'/singleuser/srv/setup'] = {
             'bind': '/srv',
             'mode': 'ro',
         }
-
+        
+        # user specific mounts as in config.yaml
         teams = cfg['users'][self.user.name] # lowercase
         mounts = cfg['mounts']
 

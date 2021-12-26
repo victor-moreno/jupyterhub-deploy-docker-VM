@@ -128,7 +128,29 @@ def _get_slide(path):
 
 @app.route('/')
 def index():
-    return render_template('files.html', root_dir=_Directory(app.basedir), base_url=app.config['BASE_URL'])
+    # reuse image list to speed page loading
+    path = os.path.expanduser('~/.jupyter/images-list.html')
+    if os.path.isfile(path):
+        with open(path) as f:
+            page = f.read()
+        f.close()
+    else:
+        page = render_template('files.html', 
+                root_dir=_Directory(app.basedir), 
+                base_url=app.config['BASE_URL'], 
+                logout= app.config['BASE_URL'].replace('deepzoom','logout'),
+                lab= app.config['BASE_URL'].replace('deepzoom','lab')
+                )
+        with open(path, 'w') as f:
+            f.write(page)
+        f.close()
+    return page
+# def index():
+#     return render_template('files.html', 
+#         root_dir=_Directory(app.basedir), 
+#         base_url=app.config['BASE_URL'], 
+#         logout= app.config['BASE_URL'].replace('deepzoom','logout')
+#         )
 
 @app.route('/<path:path>')
 def slide(path):
