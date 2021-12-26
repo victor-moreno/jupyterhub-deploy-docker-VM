@@ -128,7 +128,8 @@ def _get_slide(path):
 
 @app.route('/')
 def index():
-    path = '/home/jovyan/.jupyter/images-list.html'
+    # reuse image list to speed page loading
+    path = os.path.expanduser('~/.jupyter/images-list.html')
     if os.path.isfile(path):
         with open(path) as f:
             page = f.read()
