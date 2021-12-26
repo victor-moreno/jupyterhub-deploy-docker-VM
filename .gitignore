@@ -1,8 +1,8 @@
 *.org
-.vscode
 .env
 bck
 data
+logs/docker-compose
 native
 secrets
 singleuser/nvtop
