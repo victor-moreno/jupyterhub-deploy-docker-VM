@@ -32,7 +32,7 @@ services:
       JHUB_DIR: ${JHUB_DIR}
       HOME_DIR: ${HOME_DIR}
       HOSTNODE: ${HOSTNAME}
-      CONFIG_RUNNING: ${CONFIG_RUNNING}
+#      CONFIG_RUNNING: ${CONFIG_RUNNING}
     env_file:
       - ${OAUTH}
     command: >
