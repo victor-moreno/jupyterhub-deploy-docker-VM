@@ -1,9 +1,14 @@
 #!/bin/bash
-cd /mnt/mimas/remote/jhub
-export HOSTNAME=$(`hostname`)
+export HOSTNAME=$(hostname)
+if [ "$HOSTNAME" == "cuda*" ]; then 
+  NODE=cuda
+else
+  NODE=mimas
+fi 
+cd /mnt/${NODE}/remote/jhub
 # logins
 echo -e "\nFailed logins\n"
-/mnt/mimas/remote/jhub/logs/docker-compose logs |grep "Failed login"
+/mnt/${NODE}/remote/jhub/logs/docker-compose logs |grep "Failed login"
 # failures
 echo -e "\nLogins:\n"
-/mnt/mimas/remote/jhub/logs/docker-compose logs |grep "User logged"
+/mnt/${NODE}/remote/jhub/logs/docker-compose logs |grep "User logged"
