@@ -50,6 +50,8 @@ imageRS412:
 	    --file singleuser/Dockerfile-rs412 \
 		singleuser
 
+imageRall: imageM imageR363 imageR405 imageR412 imageRS363 imageRS405 imageRS412 
+
 imageS:
 	docker build -t jupyter-snpimpute \
 	    --file singleuser/Dockerfile-snpimpute \
