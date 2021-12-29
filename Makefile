@@ -10,21 +10,18 @@ imageM:
 	docker build -t jupyter-minimal \
 	    --file singleuser/Dockerfile-minimal \
 		singleuser
-
+imageD:
+	docker build -t jupyter-dl \
+	    --file singleuser/Dockerfile-dl \
+		singleuser
+imageF:
+	docker build -t jupyter-full \
+	    --file singleuser/Dockerfile-full \
+		singleuser
 imageG:
 	docker build -t jupyter-gpu \
 	    --file singleuser/Dockerfile-gpu \
 		singleuser
-
-imageC:
-	docker build -t jupyter-cuda \
-	    --file singleuser/Dockerfile-cuda \
-		singleuser
-imageT:
-	docker build -t jupyter-torch \
-	    --file singleuser/Dockerfile-torch \
-		singleuser
-
 imageR363:
 	docker build -t jupyter-r363 \
 	    --file singleuser/Dockerfile-r363 \
@@ -50,21 +47,11 @@ imageRS412:
 	    --file singleuser/Dockerfile-rs412 \
 		singleuser
 
-imageRall: imageM imageR363 imageR405 imageR412 imageRS363 imageRS405 imageRS412 
-
-imageS:
-	docker build -t jupyter-snpimpute \
-	    --file singleuser/Dockerfile-snpimpute \
-		singleuser
+imageAll: imageM imageD imageF imageR363 imageR405 imageR412 imageRS363 imageRS405 imageRS412
 
 imageZ:
 	docker build -t jupyter-deepzoom \
 	    --file singleuser/Dockerfile-deepzoom \
-		singleuser
-
-imageF:
-	docker build -t jupyter-full \
-	    --file singleuser/Dockerfile-full \
 		singleuser
 
 imageV:
@@ -77,12 +64,7 @@ imageRefine:
 	    --file singleuser/Dockerfile-refine \
 		singleuser
 
-imageN:
-	docker build -t jupyter-nvidia \
-	    --file singleuser/Dockerfile-nvidia \
-		singleuser
-
-imageD:
+imageT:
 	docker build -t jupyter-devel \
 	    --file singleuser/Dockerfile-devel \
 		singleuser

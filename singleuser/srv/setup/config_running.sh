@@ -45,4 +45,3 @@ if [ "$JUPYTER_IMAGE_SPEC" == "jupyter-vnc" ] && [ ! -f ${HOME}/Desktop/labelimg
 fi
 
 
-

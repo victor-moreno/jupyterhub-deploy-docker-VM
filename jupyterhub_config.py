@@ -67,11 +67,11 @@ def get_options_form(spawner):
         ]
         return """
         <br><br>
-        <label for="image">Select an image for {username}:</label>
+        <h3>Select an image</h3><br><br>{havecuda}<br><br><b>User:  {username}</b><br><br>
         <select class="form-control" name="image" required autofocus>
         {options}
         </select>
-        """.format(options=options, username=username)
+        """.format(options=options, username=username, havecuda='All can run CUDA' if CUDA else '')
     else:
         spawner.image = [v for k,v in allowed_images.items()][0]
 
@@ -175,9 +175,11 @@ c.DockerSpawner.extra_create_kwargs = {
 }
 
 # nvidia
+# /dev/shm 64M > 16G
 if CUDA:
     c.DockerSpawner.extra_host_config = {
     'runtime': 'nvidia',
+    'shm_size': '16gb'
     }
 
 # 'device_requests': [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]], ), ], }
