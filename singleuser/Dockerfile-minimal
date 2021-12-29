@@ -7,8 +7,10 @@
 # https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
 # ARG ROOT_CONTAINER=ubuntu:focal
 
-# nvidia/cuda 11.2
-ARG ROOT_CONTAINER=nvidia/cuda:11.2.2-cudnn8-runtime-ubuntu20.04
+# from .env
+# cuda:    ARG ROOT_CONTAINER=nvidia/cuda:11.2.2-cudnn8-runtime-ubuntu20.04
+# genrisk: ARG ROOT_CONTAINER=ubuntu:20.04
+ARG ROOT_CONTAINER
 
 ### base
 

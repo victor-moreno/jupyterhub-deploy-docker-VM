@@ -9,6 +9,7 @@ network:
 imageM:
 	docker build -t jupyter-minimal \
 	    --file singleuser/Dockerfile-minimal \
+	    --build-arg ROOT_CONTAINER=${ROOT_CONTAINER} \
 		singleuser
 imageD:
 	docker build -t jupyter-dl \
