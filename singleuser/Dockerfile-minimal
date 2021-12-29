@@ -301,9 +301,21 @@ COPY nvtop /usr/local/bin/nvtop
 # RUN pip3 install jupyterlab-spreadsheet-editor 
 # RUN pip3 install lckr-jupyterlab-variableinspector
 
+# extra
+
+RUN mamba install --quiet --yes \
+        plotly \
+        umap-learn \
+ && pip install --no-cache-dir      nvitop \
+ && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
+
+# /extra
+
 WORKDIR /home/${NB_USER}
 ENV START=/lab
 USER ${NB_UID}
 
 ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
 CMD ["start-singleuser.sh"]
+
+
