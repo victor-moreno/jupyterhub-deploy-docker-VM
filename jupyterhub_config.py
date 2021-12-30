@@ -129,8 +129,8 @@ class CustomDockerSpawner(DockerSpawner):
     
     # mount volumes by team
     def start(self):
-#        username = self.user.name
         username = set_USER(self)
+#       username = self.user.name
 
         # home dir
         self.volumes[f"{home_dir}/{username.split('@')[0]}"] = {
@@ -167,8 +167,7 @@ class CustomDockerSpawner(DockerSpawner):
 # c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 c.JupyterHub.spawner_class = CustomDockerSpawner
 
-# 'user': 'root',
-
+# hub runs as 'root',
 c.DockerSpawner.extra_create_kwargs = {
 'user': 'root',
 'hostname': 'hub',
@@ -181,9 +180,6 @@ if CUDA:
     'runtime': 'nvidia',
     'shm_size': '16gb'
     }
-
-# 'device_requests': [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]], ), ], }
-
 
 # JupyterHub requires a single-user instance of the Notebook server, so we
 # default to using the `start-singleuser.sh` script included in the
@@ -207,13 +203,13 @@ c.DockerSpawner.extra_host_config.update({ 'network_mode': network_name })
 
 # external proxy
 c.JupyterHub.cleanup_servers = False
-# tells the hub to not stop servers when the hub restarts (this is useful even if you don’t run the proxy separately).
+# tells the hub to not stop servers when the hub restarts (proxy runs separately).
 
 c.ConfigurableHTTPProxy.should_start = False
 # tells the hub that the proxy should not be started (because you start it yourself).
 c.ConfigurableHTTPProxy.auth_token = os.environ.get('CONFIGPROXY_AUTH_TOKEN')
 # token for authenticating communication with the proxy.
-c.ConfigurableHTTPProxy.api_url = 'http://jupyterproxy:8001' #'http://192.168.1.254:8001'
+c.ConfigurableHTTPProxy.api_url = 'http://jupyterproxy:8001'
 # the URL which the hub uses to connect to the proxy’s API.
 
 # Remove containers once they are stopped
@@ -336,13 +332,8 @@ c.MultiOAuthenticator.authenticators = [
         
 import nativeauthenticator
 c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}/templates/"]
+# template modified to allow github/google oauth
 #  ["/usr/local/lib/python3.8/dist-packages/nativeauthenticator/templates/"]
-# to do:
-#       pip install nativeauthenticator
-#	copy templates to /rv/templates
-#	modify native-login.html to allow github/google logins
-#	c.JupyterHub.template_paths = [ "/srv/templates"]
-
 
 # google
 # https://oauthenticator.readthedocs.io/en/latest/api/gen/oauthenticator.google.html

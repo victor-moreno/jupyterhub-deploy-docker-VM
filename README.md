@@ -9,28 +9,17 @@
 #### Dockerfile
     install: 
         dockerspawner 
-        oauthenticator
-        nativeauthenticator
         jupyterhub-idle-culler 
         PyJWT
+        pyyaml
+        oauthenticator
+        nativeauthenticator (modified template to allow github/google )
 
 #### jupyterhub_config.py
-
-    MyDockerSpawner: mounts volumes according to user
+    customize user images as defined in config.yaml (sample in singleuser/srv/setup)
+    MyDockerSpawner: mounts volumes according to user config
     MultiOAuthenticator: native, github, google
-
-### client image 
-
-#### jupyterhub_config.py:
     c.JupyterHub.base_url = '/jhub/'
-    c.ServerProxy.servers
-
-#### Dockerfile
-    from:
-        gpu-jupyter inspired in cschranz/gpu-jupyter
-    install: 
-        code-server
-        rstudio
 
 #### configurable proxy
     runs as a separated docker sharing the network. This way shutting down the hub doesn't close clients
@@ -39,11 +28,8 @@
 ### build jupyterhub server:
     make build
 
-### build jupyterlab client:
-    make image?
-
-### start
-    docker-compose up -d
+### client images
+    diverse images in singleuser/Dockerfile-xxx
 
 ### services for jupyter_proxy
     in singleuser/srv:
@@ -54,4 +40,9 @@
     - jupyter_openrefine_proxy (openrefine)
     - jupyter-logout (logout/comntrol/resources)
     - jupyter_labelimg_proxy (labelimg)
-    
+
+### build jupyterlab clients:
+    make image?
+
+### start
+    docker-compose up -d

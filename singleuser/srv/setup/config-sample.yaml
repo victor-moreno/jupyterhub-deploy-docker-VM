@@ -1,0 +1,59 @@
+users:
+    admin: 
+        - uid: 1001
+        - gid: 1001
+        - admin
+        - sudo
+    user1: 
+        - uid: 1002
+        - gid: 1004
+        - R
+        - projects
+    user2:
+        - uid: 1003
+        - gid: 1004
+        - R
+        - sudo
+        - devel
+
+available_images: 
+    M:
+        'Python  (3.9.7)': 
+            jupyter-minimal
+    R363:
+        'Python & R 3.6.3': 
+            jupyter-r363
+    RS363:
+        'RStudio 3.6.3': 
+            jupyter-rs363
+    R405:
+        'Python & R 4.0.5': 
+            jupyter-r405
+    RS405:
+        'RStudio 4.0.5': 
+            jupyter-rs405
+    R412:
+        'Python & R 4.1.2': 
+            jupyter-r412
+    RS412:
+        'RStudio 4.1.2': 
+            jupyter-rs412
+    T:
+        'Test': 
+            jupyter-test
+
+images: 
+    admin:
+        [M]
+    R:
+        [M, R363, R405, R412, RS363, RS405, RS412]
+    devel:
+        [D]
+
+mounts:
+    R:
+        '/mnt/server/jhub/data/library/':
+            ['/library', rw]
+    projects:
+        '/mnt/server/jhub/data/projects/':
+            ['/home/USER/projects', rw]
