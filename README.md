@@ -12,7 +12,7 @@
         oauthenticator
         nativeauthenticator
         jupyterhub-idle-culler 
-        PyJWT 
+        PyJWT
 
 #### jupyterhub_config.py
 
@@ -27,9 +27,9 @@
 
 #### Dockerfile
     from:
-        gpu-jupyter  cschranz/gpu-jupyter:v1.4_cuda-11.0_ubuntu-18.04
+        gpu-jupyter inspired in cschranz/gpu-jupyter
     install: 
-        code server
+        code-server
         rstudio
 
 #### configurable proxy
@@ -40,7 +40,7 @@
     make build
 
 ### build jupyterlab client:
-    make image
+    make image?
 
 ### start
     docker-compose up -d
@@ -51,3 +51,7 @@
     - jupyter_codeserver_proxy (Code Server)
     - jupyter_deepzoom_proxy (openslide python)
     - jupyter_tensorboard_proxy (tensorboard)
+    - jupyter_openrefine_proxy (openrefine)
+    - jupyter-logout (logout/comntrol/resources)
+    - jupyter_labelimg_proxy (labelimg)
+    
