@@ -354,6 +354,16 @@ c.NativeAuthenticator.check_common_password = True
 c.NativeAuthenticator.minimum_password_length = 8
 c.NativeAuthenticator.allowed_failed_logins = 3
 
+<<<<<<< HEAD
+=======
+c.NativeAuthenticator.enable_signup = True
+# recaptcha config
+# https://www.google.com/recaptcha/admin/site/500725121/settings
+c.NativeAuthenticator.recaptcha_key = os.environ['RECAPCHA_KEY']
+c.NativeAuthenticator.recaptcha_secret = os.environ['RECAPCHA_SECRET']
+c.NativeAuthenticator.tos = 'Acepto las <a href="https://remote.genrisk.org/CDU.html" target="_blank">condiciones de uso</a>'
+
+>>>>>>> b1c4985 (211229)
 # end OAuth
 
 ## enable authentication state0
