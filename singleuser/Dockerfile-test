@@ -1,1 +1,13 @@
-FROM jupyter-cuda
+FROM lassoan/slicer-notebook
+
+# not working
+
+USER root
+RUN apt-get update && apt-get install tini
+
+WORKDIR /home/${NB_USER}
+ENV START=/tree
+USER ${NB_UID}
+
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

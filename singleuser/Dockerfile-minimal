@@ -306,6 +306,8 @@ COPY nvtop /usr/local/bin/nvtop
 RUN mamba install --quiet --yes \
         plotly \
         umap-learn \
+        htop \
+        mc \
  && pip install --no-cache-dir      nvitop \
  && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
 

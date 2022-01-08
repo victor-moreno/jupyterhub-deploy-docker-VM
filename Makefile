@@ -66,8 +66,8 @@ imageRefine:
 		singleuser
 
 imageT:
-	docker build -t jupyter-devel \
-	    --file singleuser/Dockerfile-devel \
+	docker build -t jupyter-test \
+	    --file singleuser/Dockerfile-test \
 		singleuser
 
 proxy:
