@@ -1,0 +1,69 @@
+FROM jupyter/minimal-notebook
+
+USER root
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y update \
+    && apt-get install -y \
+    dbus-x11 \
+    firefox \
+    xfce4 \
+    xfce4-panel \
+    xfce4-session \
+    xfce4-settings \
+    xorg \
+    xubuntu-icon-theme \
+    curl \
+    pyqt5-dev-tools \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
+
+# https://github.com/mathworks-ref-arch/matlab-integration-for-jupyter/blob/main/matlab-vnc/Dockerfile
+# Install tigervnc 1.10 to /usr/local !! 1.11 not working
+RUN curl -sSfL 'https://sourceforge.net/projects/tigervnc/files/stable/1.10.1/tigervnc-1.10.1.x86_64.tar.gz/download' \
+    | tar -zxf - -C /usr/local --strip=2
+
+# Get noVNC
+ENV NOVNC_PATH=/opt/noVNC
+RUN mkdir -p ${NOVNC_PATH} \
+     && curl -sSfL 'https://github.com/novnc/noVNC/archive/v1.2.0.tar.gz' \
+     | tar -zxf - -C ${NOVNC_PATH} --strip=1 \ 
+     && chown -R ${NB_USER}:users ${NOVNC_PATH} \
+     && chmod -R 775 ${NOVNC_PATH} 
+
+RUN conda install -c conda-forge websockify=0.9.0 \
+    jupyter-server-proxy pyyaml \
+    bash nano \
+    openslide openslide-python flask \
+    Pillow labelimg
+
+COPY srv /srv
+
+RUN pip3 install --no-cache-dir --use-feature=in-tree-build /srv/jupyter_labelimg_proxy \
+ && cp /srv/jupyter_labelimg_proxy/jupyter_labelimg_proxy/resources/novnc_lite.html /opt/noVNC/index.html \
+ && chown -R ${NB_USER}:users /opt/noVNC/index.html && chmod 755 /opt/noVNC/index.html \
+ && cp /srv/jupyter_labelimg_proxy/jupyter_labelimg_proxy/resources/user-dirs.defaults /etc/xdg/user-dirs.defaults \
+ && pip3 install --no-cache-dir --use-feature=in-tree-build /srv/jupyter_deepzoom_proxy
+
+# Slicer
+# decompress package to /tmp:
+ADD slicer/slicer.tar.gz /tmp
+COPY slicer/xorg.conf /tmp
+COPY slicer/start-xorg.sh /tmp
+COPY slicer/install.sh /tmp
+RUN mkdir /tmp/runtime-sliceruser
+ENV XDG_RUNTIME_DIR=/tmp/runtime-sliceruser
+
+ENV VNCPORT=49053
+ENV DISPLAY=:10
+
+RUN cd /tmp && mv /tmp/Slicer* Slicer && ./install.sh /tmp/Slicer/Slicer
+
+
+USER $NB_USER
+
+ENV START=/lab
+
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-singleuser.sh"]

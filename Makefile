@@ -70,6 +70,11 @@ imageT:
 	    --file singleuser/Dockerfile-test \
 		singleuser
 
+imageS:
+	docker build -t jupyter-test \
+	    --file singleuser/Dockerfile-slicer \
+		singleuser
+
 proxy:
 	docker build -t jupyterproxy \
 	    --file proxy/Dockerfile \
