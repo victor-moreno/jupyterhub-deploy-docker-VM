@@ -118,7 +118,7 @@ c.DockerSpawner.environment = {
 'GRANT_SUDO': set_sudo, 
 }
 
-home_dir = os.environ.get('HOME_DIR')
+home_dir = os.environ.get('HOME_DIR') # data/
 
 # notebook_dir = '/home/' + spawner.user.name
 # c.DockerSpawner.notebook_dir = notebook_dir
@@ -145,7 +145,7 @@ class CustomDockerSpawner(DockerSpawner):
         }
 
         # mount /srv from files in /singleuser/srv/setup
-        self.volumes[os.environ['JHUB_DIR']+'/singleuser/srv/setup'] = {
+        self.volumes[os.environ.get('JHUB_DIR')+'/singleuser/srv/setup'] = {
             'bind': '/srv',
             'mode': 'ro',
         }

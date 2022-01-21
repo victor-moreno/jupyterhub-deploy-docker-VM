@@ -27,8 +27,12 @@ def setup_openvscode():
   def _get_cmd(port):
     cmd = [
             get_openvscode('server.sh'), 
-            '--port {port}',
-            '--connection-token openvscode'
+            '--port={port}',
+            '--without-connection-token',
+            '--accept-server-license-terms',
+            '--use-host-proxy',
+            '--disable-telemetry=true'
+
     ]
     return cmd
   

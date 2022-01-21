@@ -17,6 +17,7 @@ ARG ROOT_CONTAINER
 FROM $ROOT_CONTAINER
 
 #**
+ARG HUB_VERSION
 ENV HUB_VERSION=1.4.2
 #**
 
@@ -312,6 +313,7 @@ RUN mamba install --quiet --yes \
  && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
 
 # /extra
+
 
 WORKDIR /home/${NB_USER}
 ENV START=/lab

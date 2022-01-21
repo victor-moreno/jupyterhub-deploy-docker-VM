@@ -36,3 +36,13 @@ RUN echo - \
 USER ${NB_UID}
 ENV START=/lab
 
+# new modules
+# hiddenlayer https://github.com/waleedka/hiddenlayer
+# torchinfo https://github.com/TylerYep/torchinfo
+# pandarallel https://github.com/nalepae/pandarallel
+
+RUN mamba install --quiet -y graphviz python-graphviz torchinfo \
+    && pip3 install --quiet --no-cache-dir git+https://github.com/waleedka/hiddenlayer.git \
+    && pip3 install --quiet --no-cache-dir pandarallel \
+    && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
+

@@ -4,6 +4,7 @@
 sed -i 's/userdel/# userdel/' /usr/local/bin/start.sh
 sed -i 's/useradd/# useradd/' /usr/local/bin/start.sh
 sed -i "s/jovyan/$NB_USER/g" /etc/passwd
+sed -i "s/jovyan/$NB_USER/g" /etc/shadow
 sed -i "s/1000:100/$NB_UID:$NB_GID/" /etc/passwd
 
 [[ -f /tmp/group ]] && cp /tmp/group /etc/group 
@@ -43,5 +44,3 @@ if [ "$JUPYTER_IMAGE_SPEC" == "jupyter-vnc" ] && [ ! -f ${HOME}/Desktop/labelimg
     touch ${HOME}/.Xauthority
     chown ${NB_UID}:${NB_GID} -R ${HOME}/.local ${HOME}/.config ${HOME}/.icons ${HOME}/Desktop ${HOME}/.Xauthority
 fi
-
-
