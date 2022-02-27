@@ -60,7 +60,6 @@ def setup_jamovi():
   
   return {
     'command': jamovi_cmd,
-    'port': 41337, 
     'timeout': 20,
     'new_browser_tab': get_key('new_browser'),
     'rewrite_response': rewrite_path, 

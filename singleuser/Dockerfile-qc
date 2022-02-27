@@ -1,0 +1,10 @@
+FROM jupyter-minimal
+
+RUN pip install 'qiskit[visualization]' \
+ && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
+
+RUN pip install git+https://github.com/qiskit-community/qiskit-textbook.git#subdirectory=qiskit-textbook-src \
+ && pip install pylatexenc \
+ && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
+
+RUN pip install cirq cirq-core[contrib]

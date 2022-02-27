@@ -88,6 +88,11 @@ imageS:
 	    --file singleuser/Dockerfile-slicer \
 		singleuser
 
+imageQC:
+	docker build -t jupyter-qc \
+	    --file singleuser/Dockerfile-qc \
+		singleuser
+
 proxy:
 	docker build -t jupyterproxy \
 	    --file proxy/Dockerfile \
@@ -95,3 +100,4 @@ proxy:
 
 build: check-files network volumes
 	docker-compose build
+
