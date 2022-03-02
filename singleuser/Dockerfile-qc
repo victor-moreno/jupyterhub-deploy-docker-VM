@@ -1,5 +1,6 @@
-FROM jupyter-minimal
+FROM jupyter-dl
 
+# qiskit
 RUN pip install 'qiskit[visualization]' \
  && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
 
@@ -7,4 +8,20 @@ RUN pip install git+https://github.com/qiskit-community/qiskit-textbook.git#subd
  && pip install pylatexenc \
  && fix-permissions "${CONDA_DIR}" && fix-permissions "/home/${NB_USER}"
 
+# cirq
 RUN pip install cirq cirq-core[contrib]
+
+# QuTip
+RUN pip install qutip
+
+# pennylane
+RUN pip install pennylane 
+RUN pip install pennylane-qiskit pennylane-cirq # pennylane-forest pennylane-qsharp
+
+RUN pip install autograd jax jaxlib
+
+# # strawberryfields
+# #       error llvmlite 0.37 > 0.36 - probably numba req
+# RUN pip install strawberryfields pennylane-sf 
+
+ 
